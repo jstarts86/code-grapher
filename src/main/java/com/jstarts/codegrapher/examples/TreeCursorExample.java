@@ -12,6 +12,16 @@ public class TreeCursorExample {
         ) {
             type = cursor.getCurrentTreeCursorNode().getType();
             assert type.equals("module");
+            cursor.gotoFirstChild();
+            type = cursor.getCurrentTreeCursorNode().getType();
+            assert type.equals("function_definition");
+            cursor.gotoFirstChild();
+            type = cursor.getCurrentTreeCursorNode().getType();
+            assert type.equals("def");
+            cursor.gotoNextSibling();
+            cursor.gotoParent();
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
