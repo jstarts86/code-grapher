@@ -2,11 +2,10 @@ package com.jstarts.codegrapher;
 
 import com.jstarts.codegrapher.examples.BasicExample;
 import com.jstarts.codegrapher.examples.TreeCursorExample;
-import ch.usi.si.seart.treesitter.*;
+
 
 public class Main {
     static {
-        LibraryLoader.load();
     }
     public static void main(String[] args) {
         System.out.println("Hello, World!");
