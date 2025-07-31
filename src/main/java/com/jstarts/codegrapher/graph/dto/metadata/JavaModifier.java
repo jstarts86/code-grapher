@@ -1,8 +1,8 @@
 package com.jstarts.codegrapher.graph.dto.metadata;
 
-public enum Modifiers {
+public enum JavaModifier {
     PUBLIC,
     PRIVATE,
     PROTECTED,
-    PACKAGE_PRIVATE
+    PACKAGE_PROTECTED
 }

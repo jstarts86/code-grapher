@@ -5,7 +5,6 @@ import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
 public class ImportDef {
     private String name;
     private String fullyQualifiedName;
-    private TypeKind type;
     private SourceLocation location;
 
     @Override

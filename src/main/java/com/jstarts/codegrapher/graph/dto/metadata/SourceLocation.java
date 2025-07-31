@@ -31,7 +31,6 @@ public class SourceLocation {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
         return "filePath: " + this.getFilePath() + "\n" + "Start line: " + this.getStartLine() + "\n End line: "
                 + this.getEndLine();
     }

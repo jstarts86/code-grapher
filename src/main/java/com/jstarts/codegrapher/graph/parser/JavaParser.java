@@ -43,12 +43,12 @@ public class JavaParser {
         List<ImportDef> imports = new ArrayList<>();
         List<TypeDef> types = new ArrayList<>();
 
-        return new ParsedFile(this.filePath, packageDef, imports, types);
+        return new ParsedFile(this.filePath, packageDef, imports, types, null);
     }
 
-    private PackageDef extractPackage(Node root, String code) {
+    public PackageDef extractPackage(Node root, String code) {
         String queryStr = "(package_declaration (scoped_identifier) @name)";
-        AtomicReference<PackageDef> packageDefRef = new AtomicReference<>();
+        // AtomicReference<PackageDef> packageDefRef = new AtomicReference<>();
 
         try (Query query = Query.getFor(Language.JAVA, queryStr)) {
             QueryCursor cursor = root.walk(query);
@@ -64,8 +64,9 @@ public class JavaParser {
                             int startLine = node.getStartPoint().getRow() + 1;
                             int endLine = node.getEndPoint().getRow() + 1;
                             SourceLocation location = new SourceLocation(this.filePath, startLine, endLine);
-                            packageDefRef.set(new PackageDef(packageName, location));
-                            return packageDefRef.get();
+                            // packageDefRef.set(new PackageDef(packageName, location));
+                            // return packageDefRef.get();
+                            return new PackageDef(packageName, location);
                         }
                     }
                 }
@@ -74,7 +75,7 @@ public class JavaParser {
             e.printStackTrace();
             return null;
         }
-        return packageDefRef.get();
+        return null;
 
     }
 

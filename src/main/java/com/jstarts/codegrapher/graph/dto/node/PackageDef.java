@@ -4,15 +4,17 @@ import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
 
 public class PackageDef {
 
-    private String name;
+    private String fullyQualifiedName;
     private SourceLocation location;
 
-    public String getName() {
-        return name;
+
+
+    public String getFullyQualifiedName() {
+        return fullyQualifiedName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullyQualifiedName(String fullyQualifiedName) {
+        this.fullyQualifiedName = fullyQualifiedName;
     }
 
     public SourceLocation getLocation() {
@@ -23,14 +25,14 @@ public class PackageDef {
         this.location = location;
     }
 
-    public PackageDef(String name, SourceLocation location) {
-        this.name = name;
+    public PackageDef(String fullyQualifiedName, SourceLocation location) {
+        this.fullyQualifiedName = fullyQualifiedName;
         this.location = location;
     }
 
     @Override
     public String toString() {
-        return "Name:\n" + this.getName() + "\n" + "Source Location:\n" + this.getLocation();
+        return "Name:\n" + this.getFullyQualifiedName() + "\n" + "Source Location:\n" + this.getLocation();
     }
 
 }

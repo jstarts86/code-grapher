@@ -1,5 +1,12 @@
 package com.jstarts.test;
 
-class Test {
+public class Test {
+    class NestedClass{
+
+    }
     // This is a simple test file.
+}
+
+interface MyInterface {
+
 }
