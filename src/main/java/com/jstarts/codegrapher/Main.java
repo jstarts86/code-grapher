@@ -1,6 +1,9 @@
 package com.jstarts.codegrapher;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,11 +11,15 @@ import com.jstarts.codegrapher.examples.BasicExample;
 import com.jstarts.codegrapher.examples.TreeCursorExample;
 import com.jstarts.codegrapher.examples.TreeQueryExample;
 import com.jstarts.codegrapher.graph.dto.ParsedFile;
+import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
+import com.jstarts.codegrapher.graph.dto.node.typedef.TypeDef;
 import com.jstarts.codegrapher.graph.parser.JavaParser;
 
 import ch.usi.si.seart.treesitter.Language;
 import ch.usi.si.seart.treesitter.LibraryLoader;
+import ch.usi.si.seart.treesitter.Node;
 import ch.usi.si.seart.treesitter.Parser;
+import ch.usi.si.seart.treesitter.Tree;
 
 public class Main {
     static {
@@ -35,10 +42,14 @@ public class Main {
         String filePath = "Test.java";
 
         try (Parser treeSitterParser = Parser.getFor(Language.JAVA)) {
+
+            String code = Files.readString(Path.of(filePath));
+            Tree tree = treeSitterParser.parse(code);
+            Node root = tree.getRootNode();
             JavaParser myParser = new JavaParser(filePath, treeSitterParser);
-            ParsedFile parsedFile = myParser.parse();
+            List<ClassDef> typeDefs = myParser.extractClass(root, code);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String jsonOutput = gson.toJson(parsedFile);
+            String jsonOutput = gson.toJson(typeDefs);
             System.out.println("parser output");
             System.out.println(jsonOutput);
 

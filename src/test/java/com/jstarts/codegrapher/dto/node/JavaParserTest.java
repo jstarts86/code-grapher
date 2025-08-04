@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
 import com.jstarts.codegrapher.graph.dto.node.PackageDef;
+import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
 import com.jstarts.codegrapher.graph.parser.JavaParser;
 
 import ch.usi.si.seart.treesitter.Language;
@@ -20,9 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class PackageDefTest {
+public class JavaParserTest {
     static {
         LibraryLoader.load();
     }
@@ -45,5 +48,26 @@ public class PackageDefTest {
         String jsonExtractedPackage = gson.toJson(extractedPackage);
         String jsonPackageDef =gson.toJson(packageDef);
         assertEquals(jsonExtractedPackage, jsonPackageDef);
+    }
+
+    @Test
+    public void testExtractClass() throws IOException {
+        String code = Files.readString(Path.of(filePath));
+        Tree tree = parser.parse(code);
+        Node root = tree.getRootNode();
+        List<ClassDef> extractedClasses = javaParser.extractClass(root, code);
+        SourceLocation locationOne = new SourceLocation(this.filePath, 3, 3);
+        SourceLocation locationTwo = new SourceLocation(this.filePath, 4, 4);
+        ClassDef classDefOne = new ClassDef("Test", "public class", locationOne, Boolean.TRUE);
+        ClassDef classDefTwo = new ClassDef("Test", "public class", locationTwo, Boolean.TRUE);
+
+        List<ClassDef> classDefs = new ArrayList<>();
+        classDefs.add(classDefOne);
+        classDefs.add(classDefTwo);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonExtractedClass = gson.toJson(extractedClasses);
+        String jsonExpectedClass = gson.toJson(classDefs);
+        assertEquals(jsonExpectedClass, jsonExpectedClass);
+
     }
 }

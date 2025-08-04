@@ -2,7 +2,7 @@ package com.jstarts.codegrapher.graph.dto;
 
 import com.jstarts.codegrapher.graph.dto.node.ImportDef;
 import com.jstarts.codegrapher.graph.dto.node.PackageDef;
-import com.jstarts.codegrapher.graph.dto.node.TypeDef;
+import com.jstarts.codegrapher.graph.dto.node.typedef.TypeDef;
 
 import java.util.List;
 

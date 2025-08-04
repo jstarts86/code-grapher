@@ -1,6 +1,6 @@
 package com.jstarts.test;
 
-public class Test {
+public static class Test {
     class NestedClass{
 
     }
