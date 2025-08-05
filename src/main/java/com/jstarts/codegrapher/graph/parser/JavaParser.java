@@ -13,6 +13,7 @@ import javax.xml.transform.Source;
 
 import com.jstarts.codegrapher.graph.dto.ParsedFile;
 import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
+import com.jstarts.codegrapher.graph.dto.node.AnnotationDef;
 import com.jstarts.codegrapher.graph.dto.node.ImportDef;
 import com.jstarts.codegrapher.graph.dto.node.PackageDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
@@ -129,6 +130,71 @@ public class JavaParser {
  //    name: (identifier) ; [26, 13] - [26, 23]
 
 
+    }
+    private List<AnnotationDef> extractAnnotation(Node root, String code) {
+        String queryStr = """
+        (marker_annotation name: (identifier) @name) @full
+        (annotation name: (identifier) @name) @full
+        (annotation name: (scoped_identifier) @name) @full
+        """;
+        List<AnnotationDef> annotationNodes = new ArrayList<>();
+
+        try (Query query = Query.getFor(Language.JAVA, queryStr)) {
+            QueryCursor cursor = root.walk(query);
+
+            for (QueryMatch match : cursor) {
+                Map<Capture, Collection<Node>> captures = match.getCaptures();
+                Node fullNode = null;
+                Node nameNode = null;
+
+                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                    String captureName = entry.getKey().getName();
+                    if ("full".equals(captureName)) {
+                        fullNode = entry.getValue().iterator().next();
+                    } else if ("name".equals(captureName)) {
+                        nameNode = entry.getValue().iterator().next();
+                    }
+                }
+
+                if (fullNode != null && nameNode != null) {
+                    String typeName = code.substring(nameNode.getStartByte(), nameNode.getEndByte());
+                    String annotationname = code.substring(fullNode.getStartByte(), fullNode.getEndByte());
+
+                    List<String> arguments = parseArguments(fullNode, code);
+
+                    AnnotationDef annotationNode = new AnnotationDef(typeName, annotationname, arguments);
+                    annotationNodes.add(annotationNode);
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return annotationNodes;
+    }
+    private List<String> parseArguments(Node fullNode, String code) {
+        List<String> argumentNames = new ArrayList<>();
+        String argumentNameQuery = "(element_value_pair key: (identifier) @key)";
+
+        try (Query query = Query.getFor(Language.JAVA, argumentNameQuery)) {
+            QueryCursor cursor = fullNode.walk(query);
+            for (QueryMatch match : cursor) {
+                Map<Capture, Collection<Node>> captures = match.getCaptures();
+                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                    String captureName = entry.getKey().getName();
+                    if ("key".equals(captureName)) {
+                        Node keyNode = entry.getValue().iterator().next();
+                        String key = code.substring(keyNode.getStartByte(), keyNode.getEndByte());
+                        argumentNames.add(key);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return argumentNames;
     }
 
     public String getFilePath() {
