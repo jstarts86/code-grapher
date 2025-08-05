@@ -6,7 +6,7 @@ public class BasicExample {
 
     public void run() {
         try (
-            Parser parser = Parser.getFor(Language.JAVA);
+            Parser parser = Parser.getFor(Language.PYTHON);
             Tree tree = parser.parse("def foo(bar, baz):\n print(bar)\n print(baz)");
         ) {
             Node root = tree.getRootNode();
