@@ -13,7 +13,10 @@ import javax.xml.transform.Source;
 
 import com.jstarts.codegrapher.graph.dto.ParsedFile;
 import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
+import com.jstarts.codegrapher.graph.dto.node.AnnotationDef;
+import com.jstarts.codegrapher.graph.dto.node.FieldDef;
 import com.jstarts.codegrapher.graph.dto.node.ImportDef;
+import com.jstarts.codegrapher.graph.dto.node.MethodDef;
 import com.jstarts.codegrapher.graph.dto.node.PackageDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.TypeDef;
@@ -26,7 +29,11 @@ import ch.usi.si.seart.treesitter.Query;
 import ch.usi.si.seart.treesitter.QueryCursor;
 import ch.usi.si.seart.treesitter.QueryMatch;
 import ch.usi.si.seart.treesitter.Tree;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class JavaParser {
     public String filePath;
     public Parser parser;
@@ -130,20 +137,194 @@ public class JavaParser {
 
 
     }
+    private List<AnnotationDef> extractAnnotation(Node root, String code) {
+        String queryStr = """
+        (marker_annotation name: (identifier) @name) @full
+        (annotation name: (identifier) @name) @full
+        (annotation name: (scoped_identifier) @name) @full
+        """;
+        List<AnnotationDef> annotationNodes = new ArrayList<>();
 
-    public String getFilePath() {
-        return filePath;
+        try (Query query = Query.getFor(Language.JAVA, queryStr)) {
+            QueryCursor cursor = root.walk(query);
+
+            for (QueryMatch match : cursor) {
+                Map<Capture, Collection<Node>> captures = match.getCaptures();
+                Node fullNode = null;
+                Node nameNode = null;
+
+                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                    String captureName = entry.getKey().getName();
+                    if ("full".equals(captureName)) {
+                        fullNode = entry.getValue().iterator().next();
+                    } else if ("name".equals(captureName)) {
+                        nameNode = entry.getValue().iterator().next();
+                    }
+                }
+
+                if (fullNode != null && nameNode != null) {
+                    String typeName = code.substring(nameNode.getStartByte(), nameNode.getEndByte());
+                    String annotationname = code.substring(fullNode.getStartByte(), fullNode.getEndByte());
+
+                    List<String> arguments = parseArguments(fullNode, code);
+
+                    AnnotationDef annotationNode = new AnnotationDef(typeName, annotationname, arguments);
+                    annotationNodes.add(annotationNode);
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return annotationNodes;
+    }
+    private List<String> parseArguments(Node fullNode, String code) {
+        List<String> argumentNames = new ArrayList<>();
+        String argumentNameQuery = "(element_value_pair key: (identifier) @key)";
+
+        try (Query query = Query.getFor(Language.JAVA, argumentNameQuery)) {
+            QueryCursor cursor = fullNode.walk(query);
+            for (QueryMatch match : cursor) {
+                Map<Capture, Collection<Node>> captures = match.getCaptures();
+                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                    String captureName = entry.getKey().getName();
+                    if ("key".equals(captureName)) {
+                        Node keyNode = entry.getValue().iterator().next();
+                        String key = code.substring(keyNode.getStartByte(), keyNode.getEndByte());
+                        argumentNames.add(key);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return argumentNames;
+    }
+    private List<FieldDef> extractFieldsByQuery(Node root, String code, String classFQN) {
+        String queryStr = """
+                (field_declaration 
+                    (modifiers)? @mods
+                    type: (_) @type
+                    (variable_declarator name: (identifier) @name)
+                )
+                """;
+
+        List<FieldDef> fieldDefs = new ArrayList<>();
+
+        try (Query query = Query.getFor(Language.JAVA, queryStr)) {
+            QueryCursor cursor = root.walk(query);
+            for (QueryMatch match : cursor) {
+                Node nameNode = null;
+                Node typeNode = null;
+                Node modsNode = null;
+
+                for (Map.Entry<Capture, Collection<Node>> entry : match.getCaptures().entrySet()) {
+                    String capName = entry.getKey().getName();
+                    Node node = entry.getValue().iterator().next();
+                    switch (capName) {
+                        case "name" -> nameNode = node;
+                        case "type" -> typeNode = node;
+                        case "mods" -> modsNode = node;
+                    }
+                }
+
+                String fieldName = nameNode != null ? code.substring(nameNode.getStartByte(), nameNode.getEndByte()) : "";
+                String type = typeNode != null ? code.substring(typeNode.getStartByte(), typeNode.getEndByte()) : "Object";
+                String modsText = modsNode != null ? code.substring(modsNode.getStartByte(), modsNode.getEndByte()) : "";
+
+                boolean isStatic = modsText.contains("static");
+                String accessModifier = "default";
+                if (modsText.contains("public")) accessModifier = "public";
+                else if (modsText.contains("private")) accessModifier = "private";
+                else if (modsText.contains("protected")) accessModifier = "protected";
+
+                fieldDefs.add(new FieldDef(fieldName, classFQN, type, isStatic, accessModifier));
+            }
+        }
+        return fieldDefs;
+    }
+        private List<MethodDef> extractMethodsByQuery(Node root, String code, String classFQN) {
+        String queryStr = """
+                (method_declaration 
+                    (modifiers)? @mods
+                    type: (_) @rtype
+                    name: (identifier) @name
+                    parameters: (formal_parameters) @params
+                )
+                """;
+
+        List<MethodDef> methodDefs = new ArrayList<>();
+
+        try (Query query = Query.getFor(Language.JAVA, queryStr)) {
+            QueryCursor cursor = root.walk(query);
+            for (QueryMatch match : cursor) {
+                Node modsNode = null;
+                Node rtypeNode = null;
+                Node nameNode = null;
+                Node paramsNode = null;
+
+                for (Map.Entry<Capture, Collection<Node>> entry : match.getCaptures().entrySet()) {
+                    String capName = entry.getKey().getName();
+                    Node node = entry.getValue().iterator().next();
+                    switch (capName) {
+                        case "mods" -> modsNode = node;
+                        case "rtype" -> rtypeNode = node;
+                        case "name" -> nameNode = node;
+                        case "params" -> paramsNode = node;
+                    }
+                }
+
+                String methodName = nameNode != null ? code.substring(nameNode.getStartByte(), nameNode.getEndByte()) : "";
+                String fqName = classFQN + "." + methodName;
+                String returnType = rtypeNode != null ? code.substring(rtypeNode.getStartByte(), rtypeNode.getEndByte()) : "void";
+
+                List<String> parameterList = new ArrayList<>();
+                if (paramsNode != null) {
+                    for (int i = 0; i < paramsNode.getNamedChildCount(); i++) {
+                        Node param = paramsNode.getNamedChild(i);
+                        parameterList.add(code.substring(param.getStartByte(), param.getEndByte()));
+                    }
+                }
+
+                // modifier 처리
+                String modsText = modsNode != null ? code.substring(modsNode.getStartByte(), modsNode.getEndByte()) : "";
+                boolean isStatic = modsText.contains("static");
+                String accessModifier = "default";
+                if (modsText.contains("public")) accessModifier = "public";
+                else if (modsText.contains("private")) accessModifier = "private";
+                else if (modsText.contains("protected")) accessModifier = "protected";
+
+                methodDefs.add(new MethodDef(methodName, fqName, parameterList, returnType, isStatic, accessModifier));
+            }
+        }
+        return methodDefs;
+    }
+    private String extractClassFullName(Node root, String code) {
+        String packageName = "";
+        String className = "";
+
+        for (int i = 0; i < root.getChildCount(); i++) {
+            Node child = root.getChild(i);
+            if ("package_declaration".equals(child.getType())) {
+                Node nameNode = child.getChild(1);
+                if (nameNode != null) {
+                    packageName = code.substring(nameNode.getStartByte(), nameNode.getEndByte());
+                }
+            }
+            if ("class_declaration".equals(child.getType())) {
+                Node nameNode = child.getChildByFieldName("name");
+                if (nameNode != null) {
+                    className = code.substring(nameNode.getStartByte(), nameNode.getEndByte());
+                }
+            }
+        }
+
+        return !packageName.isEmpty() ? packageName + "." + className : className;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
+    
 
-    public Parser getParser() {
-        return parser;
-    }
 
-    public void setParser(Parser parser) {
-        this.parser = parser;
-    }
 }
