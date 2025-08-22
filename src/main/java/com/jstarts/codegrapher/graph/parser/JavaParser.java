@@ -1,15 +1,15 @@
 package com.jstarts.codegrapher.graph.parser;
 
 import java.io.IOException;
+import java.lang.reflect.AccessFlag.Location;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.xml.transform.Source;
+import java.util.Set;
 
 import com.jstarts.codegrapher.graph.dto.ParsedFile;
 import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
@@ -20,6 +20,7 @@ import com.jstarts.codegrapher.graph.dto.node.MethodDef;
 import com.jstarts.codegrapher.graph.dto.node.PackageDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.TypeDef;
+import com.jstarts.codegrapher.graph.dto.usage.TypeUsage;
 
 import ch.usi.si.seart.treesitter.Capture;
 import ch.usi.si.seart.treesitter.Language;
@@ -43,29 +44,26 @@ public class JavaParser {
         this.parser = parser;
     }
 
-    public ParsedFile parse() throws IOException {
-        String code = Files.readString(Path.of(filePath));
-        Tree tree = parser.parse(code);
-        Node root = tree.getRootNode();
-
-        PackageDef packageDef = extractPackage(root, code);
-
-        List<ImportDef> imports = new ArrayList<>();
-        List<TypeDef> types = new ArrayList<>();
-
-        return new ParsedFile(this.filePath, packageDef, imports, types, null);
-    }
+    // public ParsedFile parse() throws IOException {
+    //     String code = Files.readString(Path.of(filePath));
+    //     Tree tree = parser.parse(code);
+    //     Node root = tree.getRootNode();
+    //
+    //     PackageDef packageDef = extractPackage(root, code);
+    //
+    //     List<ImportDef> imports = new ArrayList<>();
+    //     List<TypeDef> types = new ArrayList<>();
+    //     return new ParsedFile(this.filePath, packageDef, imports, types, typeUsages, null);
+    // }
 
     public PackageDef extractPackage(Node root, String code) {
         String queryStr = "(package_declaration (scoped_identifier) @name)";
-        // AtomicReference<PackageDef> packageDefRef = new AtomicReference<>();
 
         try (Query query = Query.getFor(Language.JAVA, queryStr)) {
             QueryCursor cursor = root.walk(query);
 
             for (QueryMatch match : cursor) {
-                Map<Capture, Collection<Node>> captures = match.getCaptures();
-                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                for (Map.Entry<Capture, Collection<Node>> entry : match.getCaptures().entrySet()) {
                     if (entry.getKey().getName().equals("name")) {
                         Collection<Node> nodes = entry.getValue();
                         if (!nodes.isEmpty()) {
@@ -75,8 +73,6 @@ public class JavaParser {
                             int startLine = node.getStartPoint().getRow() + 1;
                             int endLine = node.getEndPoint().getRow() + 1;
                             SourceLocation location = new SourceLocation(this.filePath, startLine, endLine);
-                            // packageDefRef.set(new PackageDef(packageName, location));
-                            // return packageDefRef.get();
                             return new PackageDef(packageName, location);
                         }
                     }
@@ -84,11 +80,10 @@ public class JavaParser {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
         return null;
-
     }
+
     public List<ClassDef> extractClass(Node root, String code) {
         String queryStr = "(class_declaration (modifiers)* @classModifier name: (identifier) @className)";
         List<ClassDef> classDefs = new ArrayList<>();
@@ -99,11 +94,8 @@ public class JavaParser {
             String modifierString = "";
             String className = "";
             
-            // Each iteration processes one class declaration
             for(QueryMatch match : cursor) {
-                // Extracted data for current class_declaration
                 Map<Capture, Collection<Node>> captures = match.getCaptures();
-                // Process all captures in match
                 for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
                     String captureName = entry.getKey().getName();
                     for(Node node : entry.getValue()) {
@@ -124,19 +116,14 @@ public class JavaParser {
                     SourceLocation location = new SourceLocation(this.filePath, startLine, endLine);
                     System.err.println("DEBUGPRINT[51]: JavaParser.java:118: location=" + location);
 
-                    ClassDef classDef = new ClassDef(className,modifierString,location,Boolean.FALSE);
+                    ClassDef classDef = new ClassDef(className,modifierString,location,"");
                     classDefs.add(classDef);
                 }
             }
         }
         return classDefs;
-        
- // (class_declaration ; [26, 0] - [102, 1]
- //    (modifiers) ; [26, 0] - [26, 6]
- //    name: (identifier) ; [26, 13] - [26, 23]
-
-
     }
+
     private List<AnnotationDef> extractAnnotation(Node root, String code) {
         String queryStr = """
         (marker_annotation name: (identifier) @name) @full
@@ -170,7 +157,6 @@ public class JavaParser {
 
                     AnnotationDef annotationNode = new AnnotationDef(typeName, annotationname, arguments);
                     annotationNodes.add(annotationNode);
-
                 }
             }
         } catch (Exception e) {
@@ -179,6 +165,7 @@ public class JavaParser {
 
         return annotationNodes;
     }
+
     private List<String> parseArguments(Node fullNode, String code) {
         List<String> argumentNames = new ArrayList<>();
         String argumentNameQuery = "(element_value_pair key: (identifier) @key)";
@@ -186,10 +173,8 @@ public class JavaParser {
         try (Query query = Query.getFor(Language.JAVA, argumentNameQuery)) {
             QueryCursor cursor = fullNode.walk(query);
             for (QueryMatch match : cursor) {
-                Map<Capture, Collection<Node>> captures = match.getCaptures();
-                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
-                    String captureName = entry.getKey().getName();
-                    if ("key".equals(captureName)) {
+                for (Map.Entry<Capture, Collection<Node>> entry : match.getCaptures().entrySet()) {
+                    if ("key".equals(entry.getKey().getName())) {
                         Node keyNode = entry.getValue().iterator().next();
                         String key = code.substring(keyNode.getStartByte(), keyNode.getEndByte());
                         argumentNames.add(key);
@@ -202,6 +187,7 @@ public class JavaParser {
         }
         return argumentNames;
     }
+
     private List<FieldDef> extractFieldsByQuery(Node root, String code, String classFQN) {
         String queryStr = """
                 (field_declaration 
@@ -245,7 +231,8 @@ public class JavaParser {
         }
         return fieldDefs;
     }
-        private List<MethodDef> extractMethodsByQuery(Node root, String code, String classFQN) {
+
+    private List<MethodDef> extractMethodsByQuery(Node root, String code, String classFQN) {
         String queryStr = """
                 (method_declaration 
                     (modifiers)? @mods
@@ -288,7 +275,6 @@ public class JavaParser {
                     }
                 }
 
-                // modifier 처리
                 String modsText = modsNode != null ? code.substring(modsNode.getStartByte(), modsNode.getEndByte()) : "";
                 boolean isStatic = modsText.contains("static");
                 String accessModifier = "default";
@@ -301,6 +287,7 @@ public class JavaParser {
         }
         return methodDefs;
     }
+
     private String extractClassFullName(Node root, String code) {
         String packageName = "";
         String className = "";
@@ -315,7 +302,7 @@ public class JavaParser {
             }
             if ("class_declaration".equals(child.getType())) {
                 Node nameNode = child.getChildByFieldName("name");
-                if (nameNode != null) {
+                if (nameNode != null) { 
                     className = code.substring(nameNode.getStartByte(), nameNode.getEndByte());
                 }
             }
@@ -324,7 +311,46 @@ public class JavaParser {
         return !packageName.isEmpty() ? packageName + "." + className : className;
     }
 
-    
+        // (type_identifier) @type
+        // (scoped_type_identifier name: (type_identifier) @type)
+        // (primitive_type) @type
+        // (type_arguments (type_identifier) @type)
+        // (array_type element: (type_identifier) @type)
+
+    private List<TypeUsage> extractDeclaredType(Node root, String code) {
+
+        List<TypeUsage> extractedTypeUsage = new ArrayList<>();
+
+        String queryStr = """
+        (type_identifier) @type
+        """;
+
+        try(Query query = Query.getFor(Language.JAVA, queryStr)) {
+            QueryCursor cursor = root.walk(query);
+            for (QueryMatch match : cursor) {
+                Map<Capture, Collection<Node>> captures = match.getCaptures();
+                for (Map.Entry<Capture, Collection<Node>> entry : captures.entrySet()) {
+                    Collection<Node> nodes = entry.getValue();
+                    String captureName = entry.getKey().getName();
+                    for (Node node : nodes) {
+                        String typeName = code.substring(node.getStartByte(),node.getEndByte());
+                        int startLine = node.getStartPoint().getRow() + 1;
+                        int endLine = node.getEndPoint().getRow() + 1;
+                        SourceLocation location = new SourceLocation(filePath, startLine, endLine);
+
+                        TypeUsage usage = new TypeUsage(typeName, location, "" , typeUseKind)
+
+                    }
+                    String captureName = entry.getKey().getName();
+                }
+
+            }
+
+            }
 
 
+
+        return extractedTypeUsage;
+
+    }
 }
