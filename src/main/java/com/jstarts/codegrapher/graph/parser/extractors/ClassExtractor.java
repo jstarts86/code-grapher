@@ -1,6 +1,7 @@
 package com.jstarts.codegrapher.graph.parser.extractors;
 
 import com.jstarts.codegrapher.graph.dto.metadata.SourceLocation;
+import com.jstarts.codegrapher.graph.dto.node.NodeDef;
 import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
 import com.jstarts.codegrapher.graph.parser.GraphBuilder;
 
@@ -15,7 +16,7 @@ public class ClassExtractor implements CodeEntityExtractor {
     }
 
     @Override
-    public void extract(Node classNode, String sourceCode, GraphBuilder graphBuilder) {
+    public void extract(Node classNode, String sourceCode, GraphBuilder graphBuilder, NodeDef currentContext) {
         // class_declaration
         Node nameNode = classNode.getChildByFieldName("name");
 
