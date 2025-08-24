@@ -46,7 +46,7 @@ public class Main {
             String code = Files.readString(Path.of(filePath));
             Tree tree = treeSitterParser.parse(code);
             Node root = tree.getRootNode();
-            JavaParser myParser = new JavaParser(filePath, treeSitterParser);
+            // JavaParser myParser = new JavaParser(filePath, treeSitterParser);
             List<ClassDef> typeDefs = myParser.extractClass(root, code);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonOutput = gson.toJson(typeDefs);
