@@ -1,25 +1,18 @@
 package com.jstarts.codegrapher;
 
+import ch.usi.si.seart.treesitter.Language;
+import ch.usi.si.seart.treesitter.LibraryLoader;
+import ch.usi.si.seart.treesitter.Parser;
+import ch.usi.si.seart.treesitter.Tree;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.jstarts.codegrapher.falkordb.FalkorConfig;
+import com.jstarts.codegrapher.raw.TsTreeBuilder;
+import com.jstarts.codegrapher.raw.dto.TsNode;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.jstarts.codegrapher.examples.BasicExample;
-import com.jstarts.codegrapher.examples.TreeCursorExample;
-import com.jstarts.codegrapher.examples.TreeQueryExample;
-import com.jstarts.codegrapher.graph.dto.ParsedFile;
-import com.jstarts.codegrapher.graph.dto.node.typedef.ClassDef;
-import com.jstarts.codegrapher.graph.dto.node.typedef.TypeDef;
-import com.jstarts.codegrapher.graph.parser.JavaParser;
-
-import ch.usi.si.seart.treesitter.Language;
-import ch.usi.si.seart.treesitter.LibraryLoader;
-import ch.usi.si.seart.treesitter.Node;
-import ch.usi.si.seart.treesitter.Parser;
-import ch.usi.si.seart.treesitter.Tree;
 
 public class Main {
     static {
@@ -27,17 +20,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
-        // System.out.println("Attempting to use java-tree-sitter ");
-        // BasicExample example1 = new BasicExample();
-        // TreeCursorExample example2 = new TreeCursorExample();
-        // TreeQueryExample example3 = new TreeQueryExample();
-        // System.err.println("DEBUGPRINT[17]: Main.java:15: example2=" + example2);
-
-        // example1.run();
-        // example2.run();
-        // example3.run();
-        System.out.println("Running Parser Test");
+        // System.out.println("Running Raw Tree-sitter Builder Test");
 
         String filePath = "Test.java";
 
@@ -45,19 +28,23 @@ public class Main {
 
             String code = Files.readString(Path.of(filePath));
             Tree tree = treeSitterParser.parse(code);
-            Node root = tree.getRootNode();
-            // JavaParser myParser = new JavaParser(filePath, treeSitterParser);
-            List<ClassDef> typeDefs = myParser.extractClass(root, code);
+
+            System.out.println("Building raw TsNode tree from: " + filePath);
+            TsTreeBuilder builder = new TsTreeBuilder();
+            TsNode rawRoot = builder.build(tree, code);
+
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String jsonOutput = gson.toJson(typeDefs);
-            System.out.println("parser output");
+            String jsonOutput = gson.toJson(rawRoot);
+
+            System.out.println("Raw TsNode Tree");
             System.out.println(jsonOutput);
+            System.out.println(" End of Raw TsNode Tree ");
+
+            FalkorConfig.main(new String[0]);
 
         } catch (IOException er) {
             System.err.println("Error reading or parsing file: " + er.getMessage());
             er.printStackTrace();
         }
-
     }
-
 }

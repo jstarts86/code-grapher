@@ -40,8 +40,8 @@ public class ClassExtractor implements CodeEntityExtractor {
                 classNode.getEndPoint().getRow() + 1
             );
 
-            ClassDef classDef = new ClassDef(className, modifiers, location, fqn);
-            graphBuilder.registerNode(classDef);
+            // ClassDef classDef = new ClassDef(className, modifiers, location, fqn);
+            // graphBuilder.registerNode(classDef);
 
 
         }
