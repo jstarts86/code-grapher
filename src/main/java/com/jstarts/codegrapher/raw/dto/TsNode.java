@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.usi.si.seart.treesitter.Node;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class TsNode {
     private final String type;
     private final String text;

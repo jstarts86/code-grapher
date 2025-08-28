@@ -12,6 +12,9 @@ public class TsTreeBuilder {
 
     private TsNode buildRecursive(Node currentNode, String sourceCode) {
         TsNode newNode = new TsNode(currentNode, sourceCode);
+        if(newNode.getType().contentEquals("class_declaration")){
+            System.out.println(newNode);
+        }
         for (int i = 0; i < currentNode.getChildCount(); i++) {
             Node childTsNode = currentNode.getChild(i);
             TsNode newChildNode = buildRecursive(childTsNode, sourceCode);

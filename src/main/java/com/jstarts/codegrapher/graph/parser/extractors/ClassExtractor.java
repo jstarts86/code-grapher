@@ -16,7 +16,7 @@ public class ClassExtractor implements CodeEntityExtractor {
     }
 
     @Override
-    public void extract(Node classNode, String sourceCode, GraphBuilder graphBuilder, NodeDef currentContext) {
+    public void extract(Node classNode, String sourceCode, String filePath) {
         // class_declaration
         Node nameNode = classNode.getChildByFieldName("name");
 
@@ -34,16 +34,16 @@ public class ClassExtractor implements CodeEntityExtractor {
 
             String fqn = packageName.isEmpty() ? className :  packageName + "." + className;
 
-            SourceLocation location = new SourceLocation(
-                graphBuilder.getFilePath(),
-                classNode.getStartPoint().getRow() + 1,
-                classNode.getEndPoint().getRow() + 1
-            );
-
-            // ClassDef classDef = new ClassDef(className, modifiers, location, fqn);
-            // graphBuilder.registerNode(classDef);
-
-
+            SourceLocation location = SourceLocation.builder()
+                .startLine(nameNode.getStartPoint().getRow() + 1)
+                .filePath(filePath)
+                .endLine(nameNode.getEndPoint().getRow() + 1)
+                .startByte(nameNode.getStartByte())
+                .endByte(nameNode.getEndByte())
+                .startCol(nameNode.getStartPoint().getColumn())
+                .endByte(nameNode.getEndPoint().getColumn())
+                .build();
+            ;
         }
     }
 }

@@ -5,5 +5,5 @@ import com.jstarts.codegrapher.graph.parser.GraphBuilder;
 import ch.usi.si.seart.treesitter.Node;
 
 public interface CodeEntityExtractor {
-    void extract(Node node, String sourceCode, GraphBuilder graphBuilder, NodeDef currentContext);
+    void extract(Node node, String sourceCode, String filePath, String packageName);
 }

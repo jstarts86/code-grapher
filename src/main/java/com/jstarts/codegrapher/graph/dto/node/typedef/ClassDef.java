@@ -12,7 +12,6 @@ public class ClassDef extends TypeDef {
 
     public ClassDef(String fullyQualifiedName, SourceLocation sourceLocation, String name, String modifiers) {
         super(fullyQualifiedName, sourceLocation, name, modifiers);
-        //TODO Auto-generated constructor stub
     }
 
 
