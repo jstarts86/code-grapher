@@ -58,7 +58,6 @@ public class FalkorConfig {
             for (Record record : resultSet) {
                 System.out.println(record.toString());
             }
-
         } catch (Exception e) {
             System.err.println("An error occurred while connecting to or querying FalkorDB: " + e.getMessage());
             e.printStackTrace();

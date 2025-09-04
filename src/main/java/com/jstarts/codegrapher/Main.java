@@ -66,7 +66,7 @@ public class Main {
             // System.out.println(testRaw);
             // System.out.println(" End of Raw TsNode Tree ");
 
-            // FalkorConfig.main(new String[0]);
+            FalkorConfig.main(new String[0]);
 
         } catch (IOException er) {
             System.err.println("Error reading or parsing file: " + er.getMessage());
