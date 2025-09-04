@@ -30,10 +30,12 @@ public class SingleFileTreeWalker {
     private String filePath;
     private String packageName;
     private Node root;
+    private GraphBuilder graphBuilder;
 
     public SingleFileTreeWalker(String sourceCode, String filePath) {
         this.sourceCode = sourceCode;
         this.filePath = filePath;
+        this.graphBuilder = new GraphBuilder(filePath, new HashMap<>(), new ArrayList<>(), null);
     };
     public void setRootNode(String code) {
         
@@ -58,7 +60,6 @@ public class SingleFileTreeWalker {
                     .flatMap(e -> e.getValue().stream())
                     .findFirst()
                     .orElse(null);
-
                 if (nameNode != null) {
                     return code.substring(
                         nameNode.getStartByte(),
@@ -69,15 +70,14 @@ public class SingleFileTreeWalker {
         } catch (Exception e) {
             System.err.println("Could not find packageName: " + e.getMessage());
         }
-
-        return null; // default package
+        return null;
     }
 
     public void walk(Node node) {
         List<CodeEntityExtractor> applicableExtractors = registry.get(node.getType());
         if (applicableExtractors != null) {
             for (CodeEntityExtractor extractor : applicableExtractors) {
-                extractor.extract(node, this.sourceCode, this.filePath, this.packageName);
+                extractor.extract(node, this.sourceCode, this.filePath, this.packageName, this.graphBuilder);
             }
         }
 
