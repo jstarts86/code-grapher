@@ -59,7 +59,8 @@ public class Main {
         try (Parser treeSitterParser = Parser.getFor(Language.JAVA)) {
 
             String code = Files.readString(Path.of(filePath));
-            testExtractor(code, filePath);
+            // testExtractor(code, filePath);
+            testRawParse(treeSitterParser, code);
             // String testRaw = testRawParse(treeSitterParser,code);
             // System.out.println("Raw TsNode Tree");
             // System.out.println(testRaw);
