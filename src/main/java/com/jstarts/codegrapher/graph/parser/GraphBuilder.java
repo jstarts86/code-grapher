@@ -3,6 +3,9 @@ package com.jstarts.codegrapher.graph.parser;
 import com.jstarts.codegrapher.graph.dto.edge.Edge;
 import com.jstarts.codegrapher.graph.dto.edge.EdgeType;
 import com.jstarts.codegrapher.graph.dto.node.NodeDef;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class GraphBuilder {
 
     private String filePath;
     private Map<String, NodeDef> nodes = new HashMap<>();
-    private final List<Edge> edges = new ArrayList<>();
+    private List<Edge> edges = new ArrayList<>();
     private NodeDef lastAddedNode;
 
     public void registerNode(NodeDef node) {

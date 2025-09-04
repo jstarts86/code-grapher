@@ -31,11 +31,7 @@
             <artifactId>jfalkordb</artifactId>
             <version>0.4.0</version>
         </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>5.1.3</version>
-        </dependency>
+        
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

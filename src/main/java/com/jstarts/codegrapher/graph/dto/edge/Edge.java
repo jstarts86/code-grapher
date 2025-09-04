@@ -13,5 +13,4 @@ public class Edge {
     private NodeDef fromNodeFQN;
     private NodeDef toNodeFQN;
     EdgeType type;
-    
 }
