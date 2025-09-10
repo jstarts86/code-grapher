@@ -4,9 +4,12 @@ import ch.usi.si.seart.treesitter.Language;
 import ch.usi.si.seart.treesitter.LibraryLoader;
 import ch.usi.si.seart.treesitter.Parser;
 import ch.usi.si.seart.treesitter.Tree;
+
+import com.falkordb.ResultSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jstarts.codegrapher.falkordb.FalkorConfig;
+import com.jstarts.codegrapher.falkordb.ingestors.TsRawNodeIngestor;
 import com.jstarts.codegrapher.graph.parser.GraphBuilder;
 import com.jstarts.codegrapher.graph.parser.SingleFileTreeWalker;
 import com.jstarts.codegrapher.graph.parser.extractors.AnnotationExtractor;
@@ -51,6 +54,13 @@ public class Main {
 
 
     }
+    public static TsNode rawParse(Parser treeSitterParser, String code) {
+        Tree tree = treeSitterParser.parse(code);
+        TsTreeBuilder builder = new TsTreeBuilder();
+        TsNode rawRoot = builder.build(tree, code);
+        return rawRoot;
+    }
+
     public static void main(String[] args) {
         // System.out.println("Running Raw Tree-sitter Builder Test");
 
@@ -60,13 +70,23 @@ public class Main {
 
             String code = Files.readString(Path.of(filePath));
             // testExtractor(code, filePath);
-            testRawParse(treeSitterParser, code);
+            // testRawParse(treeSitterParser, code);
             // String testRaw = testRawParse(treeSitterParser,code);
             // System.out.println("Raw TsNode Tree");
             // System.out.println(testRaw);
             // System.out.println(" End of Raw TsNode Tree ");
+            FalkorConfig config = new FalkorConfig("localhost", 6379, "social");
+            TsRawNodeIngestor rawIngestor = new TsRawNodeIngestor(config);
+            TsNode testRawNode = rawParse(treeSitterParser, code);
+            System.out.print("Printing result Set");
+            Long createdId  =  rawIngestor.createGraphNode(testRawNode);
+            // Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            // System.out.println(gson.toJson(resultSet));
+            System.out.print( "this is the " + createdId);
 
-            FalkorConfig.main(new String[0]);
+
+            // FalkorConfig.main(new String[0]);
+
 
         } catch (IOException er) {
             System.err.println("Error reading or parsing file: " + er.getMessage());
