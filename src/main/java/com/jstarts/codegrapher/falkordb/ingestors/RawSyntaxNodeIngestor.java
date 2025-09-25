@@ -3,24 +3,36 @@ package com.jstarts.codegrapher.falkordb.ingestors;
 import com.falkordb.Record;
 import com.falkordb.ResultSet;
 import com.jstarts.codegrapher.falkordb.FalkorConfig;
-import com.jstarts.codegrapher.raw.dto.TsNode;
+import com.jstarts.codegrapher.raw.dto.RawSyntaxNode;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TsRawNodeIngestor {
+public class RawSyntaxNodeIngestor {
+    class StackFrame{
+        RawSyntaxNode treeNode;
+        Long dbNodeId;
+        public StackFrame(RawSyntaxNode treeNode, Long dbNodeId) {
+            this.treeNode = treeNode;
+            this.dbNodeId = dbNodeId;
+        }
+
+
+    }
     private final FalkorConfig falkorConfig;
 
-    public TsRawNodeIngestor(FalkorConfig falkorConfig) {
+    public RawSyntaxNodeIngestor(FalkorConfig falkorConfig) {
         this.falkorConfig = falkorConfig;
     }
 
-    public void ingest(TsNode rootNode) {
+    public void ingest(RawSyntaxNode rootNode) {
         ingestNodeRecursive(rootNode, null);
     }
 
-    public Long createGraphNode(TsNode tsNode) {
+    public Long createGraphNode(RawSyntaxNode tsNode) {
         Map<String, Object> params = Map.of(
             "type", tsNode.getType(),
             "text", tsNode.getText(),
@@ -33,7 +45,9 @@ public class TsRawNodeIngestor {
 
         );
 
-        ResultSet result =  falkorConfig.executeQuery("CREATE (n:tsNode {type: $type, text: $text, startByte: $startByte, endByte: $endByte, startLine: $startLine, endLine: $endLine, startCol: $startCol, endCol: $endCol})" 
+        ResultSet result =  falkorConfig.executeQuery("CREATE (n:tsNode {type: $type, text: $text, "
+            + "startByte: $startByte, endByte: $endByte, startLine: $startLine, endLine: $endLine,"
+            + " startCol: $startCol, endCol: $endCol})" 
             + "RETURN id(n) as nodeId"
             ,params);
         for (Record record : result) {
@@ -48,10 +62,22 @@ public class TsRawNodeIngestor {
     }
 
     public void createGraphRelationship(Long parentId, Long childId, String relType) {
+        Map<String, Object> params = Map.of(
+        "parentId",parentId,
+        "childId", childId
+        );
+
+        falkorConfig.executeQuery(
+            "MATCH (p), (c)" +
+            "WHERE id(p) = $parentId AND id(c) = $childId " +
+            "CREATE (p)-[:" + relType + "]->(c)",
+            params
+        );
+
 
     }
 
-    private void ingestNodeRecursive(TsNode tsNode, String parentId) {
+    private void ingestNodeRecursive(RawSyntaxNode tsNode, String parentId) {
         String nodeId = UUID.randomUUID().toString();
         Map<String, Object> params = new HashMap<>();
         params.put("nodeId", nodeId);
@@ -73,12 +99,26 @@ public class TsRawNodeIngestor {
             falkorConfig.executeQuery(edgeQuery, edgeParams);
         }
 
-        for (TsNode child : tsNode.getChildren()) {
+        for (RawSyntaxNode child : tsNode.getChildren()) {
             ingestNodeRecursive(child, nodeId);
         }
     }
 
-    private void ingestNodeIteratively(TsNode root) {
+    public void ingestNodeIteratively(RawSyntaxNode root) {
+        Deque<StackFrame> stack = new ArrayDeque<>();
+        Long rootDbId = createGraphNode(root);
+        stack.push(new StackFrame(root, rootDbId));
+        while(!stack.isEmpty()) {
+            StackFrame frame = stack.pop();
+            RawSyntaxNode current = frame.treeNode;
+            Long currentId = frame.dbNodeId;
+
+            for(RawSyntaxNode child : current.getChildren()) {
+                Long childId = createGraphNode(child);
+                createGraphRelationship(currentId, childId, "CONTAINS");
+                stack.push(new StackFrame(child, childId));
+            }
+        }
 
     }
 }

@@ -40,3 +40,4 @@ build/
 GEMINI.md
 # plan.md
 node_modules/
+test-data/
