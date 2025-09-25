@@ -4,15 +4,20 @@ import ch.usi.si.seart.treesitter.Language;
 import ch.usi.si.seart.treesitter.LibraryLoader;
 import ch.usi.si.seart.treesitter.Parser;
 import ch.usi.si.seart.treesitter.Tree;
+import ch.usi.si.seart.treesitter.printer.TreePrinter;
+
+import com.falkordb.ResultSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jstarts.codegrapher.falkordb.FalkorConfig;
+import com.jstarts.codegrapher.falkordb.ingestors.JavaRepoRawNodeIngestor;
+import com.jstarts.codegrapher.falkordb.ingestors.RawSyntaxNodeIngestor;
 import com.jstarts.codegrapher.graph.parser.GraphBuilder;
 import com.jstarts.codegrapher.graph.parser.SingleFileTreeWalker;
 import com.jstarts.codegrapher.graph.parser.extractors.AnnotationExtractor;
 import com.jstarts.codegrapher.graph.parser.extractors.ClassExtractor;
 import com.jstarts.codegrapher.raw.TsTreeBuilder;
-import com.jstarts.codegrapher.raw.dto.TsNode;
+import com.jstarts.codegrapher.raw.dto.RawSyntaxNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +31,7 @@ public class Main {
     public static void testRawParse(Parser treeSitterParser, String code) {
         Tree tree = treeSitterParser.parse(code);
         TsTreeBuilder builder = new TsTreeBuilder();
-        TsNode rawRoot = builder.build(tree, code);
+        RawSyntaxNode rawRoot = builder.build(tree, code);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonOutput = gson.toJson(rawRoot);
         System.out.println("Raw TsNode Tree");
@@ -51,22 +56,26 @@ public class Main {
 
 
     }
+    public static RawSyntaxNode rawParse(Parser treeSitterParser, String code) {
+        Tree tree = treeSitterParser.parse(code);
+        TsTreeBuilder builder = new TsTreeBuilder();
+        RawSyntaxNode rawRoot = builder.build(tree, code);
+        return rawRoot;
+    }
+
     public static void main(String[] args) {
-        // System.out.println("Running Raw Tree-sitter Builder Test");
+        try {
+            FalkorConfig config = new FalkorConfig("localhost", 6379, "rawRepoLayer");
+            String projectRoot = "test-data/gson";
+            // String projectRoot = "."; 
+            JavaRepoRawNodeIngestor repoIngestor = new JavaRepoRawNodeIngestor(config, projectRoot);
+            
+            System.out.println("clear graph");
+            config.executeQuery("MATCH (n) DETACH DELETE n");
 
-        String filePath = "Test.java";
-
-        try (Parser treeSitterParser = Parser.getFor(Language.JAVA)) {
-
-            String code = Files.readString(Path.of(filePath));
-            // testExtractor(code, filePath);
-            testRawParse(treeSitterParser, code);
-            // String testRaw = testRawParse(treeSitterParser,code);
-            // System.out.println("Raw TsNode Tree");
-            // System.out.println(testRaw);
-            // System.out.println(" End of Raw TsNode Tree ");
-
-            // FalkorConfig.main(new String[0]);
+            System.out.println("repository ingestion start");
+            repoIngestor.ingestRepository();
+            System.out.println("repo ingestion finish");
 
         } catch (IOException er) {
             System.err.println("Error reading or parsing file: " + er.getMessage());
