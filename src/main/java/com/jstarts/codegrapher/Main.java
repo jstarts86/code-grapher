@@ -10,7 +10,6 @@ import com.falkordb.ResultSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jstarts.codegrapher.falkordb.FalkorConfig;
-import com.jstarts.codegrapher.falkordb.ingestors.JavaRepoRawNodeIngestor;
 import com.jstarts.codegrapher.falkordb.ingestors.RawSyntaxNodeIngestor;
 import com.jstarts.codegrapher.graph.parser.GraphBuilder;
 import com.jstarts.codegrapher.graph.parser.SingleFileTreeWalker;
