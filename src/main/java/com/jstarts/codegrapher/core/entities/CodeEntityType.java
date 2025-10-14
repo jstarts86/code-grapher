@@ -3,6 +3,7 @@ package com.jstarts.codegrapher.core.entities;
 public enum CodeEntityType {
     FILE,
     MODULE,
+    PACKAGE,
     CLASS,
     FUNCTION,
     METHOD,
@@ -12,5 +13,7 @@ public enum CodeEntityType {
     IMPORT,
     DECORATOR,
     LAMBDA,
-    ATTRIBUTE
+    ATTRIBUTE,
+    ASSIGNMENT,
+    ARGUMENT
 }
