@@ -51,9 +51,6 @@ public abstract class CodeEntity {
         return props;
     }
 
-
-
-
     public static abstract class Builder<T extends Builder<T>> {
         private String id;
         private String name;
@@ -65,17 +62,63 @@ public abstract class CodeEntity {
         private String language = "python";
         private long version = System.currentTimeMillis();
 
-        public T id(String id) { this.id = id; return self();}
-        public T name(String name) { this.name = name; return self();}
-        public T type(CodeEntityType type) { this.type = type; return self();}
-        public T location(SourceLocation loc) { this.location = loc; return self();}
-        public T parentId(String parentId) { this.parentId = parentId; return self();}
-        public T addModifier(String modifier) { this.modifiers.add(modifier); return self();}
-        public T addAttribute(String key, Object val) { this.attributes.put(key,val); return self();}
-        public T version(long v) { this.version = v; return self();}
+        public T modifiers(Set<String> modifiers) {
+            this.modifiers = new HashSet<>(modifiers);
+            return self();
+        }
 
+        public T attributes(Map<String, Object> attributes) {
+            this.attributes = new HashMap<>(attributes);
+            return self();
+        }
+
+        public T id(String id) {
+            this.id = id;
+            return self();
+        }
+
+        public T name(String name) {
+            this.name = name;
+            return self();
+        }
+
+        public T type(CodeEntityType type) {
+            this.type = type;
+            return self();
+        }
+
+        public T location(SourceLocation loc) {
+            this.location = loc;
+            return self();
+        }
+
+        public T parentId(String parentId) {
+            this.parentId = parentId;
+            return self();
+        }
+
+        public T language(String language) {
+            this.language = language;
+            return self();
+        }
+
+        public T addModifier(String modifier) {
+            this.modifiers.add(modifier);
+            return self();
+        }
+
+        public T addAttribute(String key, Object val) {
+            this.attributes.put(key, val);
+            return self();
+        }
+
+        public T version(long v) {
+            this.version = v;
+            return self();
+        }
 
         protected abstract T self();
+
         public abstract CodeEntity build();
     }
 
