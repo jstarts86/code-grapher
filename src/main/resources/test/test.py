@@ -23,6 +23,10 @@ def cached_compute(n: int) -> int:
     return cached_compute(n - 1) + cached_compute(n - 2)
 
 
+class Chicken:
+    kind = "generic"
+
+
 class Shape:
     kind = "generic"
 
@@ -37,13 +41,22 @@ class Shape:
         return "Base shape class"
 
 
-class Circle(Shape):
+class Pair[T, U]:
+    def __init__(self, first: T, second: U):
+        self.first = first
+        self.second = second
+
+    def swap(self) -> "Pair[U, T]":
+        return Pair(self.second, self.first)
+
+
+class Circle(Shape, Chicken):
     def __init__(self, radius: float, color: str = "blue"):
         super().__init__(color)
         self.radius = radius
 
     def area(self) -> float:
-        return PI * self.radius ** 2
+        return PI * self.radius**2
 
     def scale(self, factor: float) -> "Circle":
         new_radius = self.radius * factor

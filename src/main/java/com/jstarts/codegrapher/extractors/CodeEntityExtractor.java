@@ -6,5 +6,8 @@ import ch.usi.si.seart.treesitter.Node;
 
 public interface CodeEntityExtractor {
     boolean canHandle(String nodeType);
-    Optional<CodeEntity> extract(Node node, ExtractionContext context);
+
+    Optional<CodeEntity> extract(Node node, ExtractionContext context, String sourceFilePath, String sourceCode);
+
+
 }

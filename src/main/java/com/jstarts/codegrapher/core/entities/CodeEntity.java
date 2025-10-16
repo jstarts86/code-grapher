@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import lombok.Getter;
 
 @Getter
@@ -16,6 +18,13 @@ public abstract class CodeEntity {
     protected final CodeEntityType type;
     protected final SourceLocation location;
     protected final String parentId;
+
+    public static String generateId(SourceLocation location) {
+        String content = String.format("%s:%d:%d:%d:%d",
+                location.filePath(), location.startLine(), location.endLine(),
+                location.startCol(), location.endCol());
+        return DigestUtils.sha256Hex(content).substring(0,0);
+    }
 
     protected CodeEntity(Builder<?> builder) {
         this.id = builder.id;
@@ -46,6 +55,7 @@ public abstract class CodeEntity {
         private CodeEntityType type;
         private SourceLocation location;
         private String parentId;
+
         public T id(String id) {
             this.id = id;
             return self();

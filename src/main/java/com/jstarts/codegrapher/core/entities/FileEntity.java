@@ -4,6 +4,7 @@ import java.util.Map;
 
 public class FileEntity extends CodeEntity {
     private final String moduleName;
+
     protected FileEntity(Builder builder) {
         super(builder);
         this.moduleName = builder.moduleName;
@@ -15,7 +16,7 @@ public class FileEntity extends CodeEntity {
 
     @Override
     public Map<String, Object> toProperties() {
-        Map<String,Object> props = super.toProperties();
+        Map<String, Object> props = super.toProperties();
         props.put("module_name", moduleName);
         return props;
     }
@@ -41,8 +42,4 @@ public class FileEntity extends CodeEntity {
         }
     }
 
-
-
-
-    
 }

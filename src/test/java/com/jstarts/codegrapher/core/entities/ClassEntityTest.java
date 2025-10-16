@@ -18,8 +18,6 @@ public class ClassEntityTest {
                 .name("MyClass")
                 .type(CodeEntityType.CLASS)
                 .location(new SourceLocation("src/app.py", 1, 10, 0, 5, 0, 100))
-                .addModifier("public")
-                .language("python")
                 .build();
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(original);
         System.out.println(json);
