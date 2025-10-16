@@ -16,10 +16,6 @@ public abstract class CodeEntity {
     protected final CodeEntityType type;
     protected final SourceLocation location;
     protected final String parentId;
-    protected final Set<String> modifiers;
-    protected final Map<String, Object> attributes;
-    protected final String language;
-    protected final long version;
 
     protected CodeEntity(Builder<?> builder) {
         this.id = builder.id;
@@ -27,10 +23,6 @@ public abstract class CodeEntity {
         this.type = builder.type;
         this.location = builder.location;
         this.parentId = builder.parentId;
-        this.modifiers = Collections.unmodifiableSet(builder.modifiers);
-        this.attributes = Collections.unmodifiableMap(builder.attributes);
-        this.language = builder.language;
-        this.version = builder.version;
     }
 
     public Map<String, Object> toProperties() {
@@ -45,9 +37,6 @@ public abstract class CodeEntity {
         props.put("end_col", location.endCol());
         props.put("start_byte", location.startByte());
         props.put("end_byte", location.endByte());
-        props.put("language", language);
-        props.put("version", version);
-        props.putAll(attributes);
         return props;
     }
 
@@ -57,21 +46,6 @@ public abstract class CodeEntity {
         private CodeEntityType type;
         private SourceLocation location;
         private String parentId;
-        private Set<String> modifiers = new HashSet<>();
-        private Map<String, Object> attributes = new HashMap<>();
-        private String language = "python";
-        private long version = System.currentTimeMillis();
-
-        public T modifiers(Set<String> modifiers) {
-            this.modifiers = new HashSet<>(modifiers);
-            return self();
-        }
-
-        public T attributes(Map<String, Object> attributes) {
-            this.attributes = new HashMap<>(attributes);
-            return self();
-        }
-
         public T id(String id) {
             this.id = id;
             return self();
@@ -94,26 +68,6 @@ public abstract class CodeEntity {
 
         public T parentId(String parentId) {
             this.parentId = parentId;
-            return self();
-        }
-
-        public T language(String language) {
-            this.language = language;
-            return self();
-        }
-
-        public T addModifier(String modifier) {
-            this.modifiers.add(modifier);
-            return self();
-        }
-
-        public T addAttribute(String key, Object val) {
-            this.attributes.put(key, val);
-            return self();
-        }
-
-        public T version(long v) {
-            this.version = v;
             return self();
         }
 

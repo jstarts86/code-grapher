@@ -9,6 +9,7 @@ import ch.usi.si.seart.treesitter.printer.TreePrinter;
 import com.falkordb.ResultSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jstarts.codegrapher.parsers.TSPythonParserFacade;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,5 +19,12 @@ public class Main {
     static {
         LibraryLoader.load();
     }
+
+    public static void main(String[] args) {
+        TSPythonParserFacade parser = new TSPythonParserFacade();
+
+    }
+
+    
 
 }

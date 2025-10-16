@@ -1,6 +1,7 @@
 package com.jstarts.codegrapher.core.entities;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,13 +10,21 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonDeserialize(builder = ClassEntity.Builder.class)
 public class ClassEntity extends CodeEntity {
+    private final List<String> superClasses;
 
     private ClassEntity(Builder builder) {
         super(builder);
+        this.superClasses = builder.superClasses;
     }
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class Builder extends CodeEntity.Builder<Builder> {
+        private List<String> superClasses;
+
+        public Builder superClasses(List<String> superClasses) {
+            this.superClasses = superClasses;
+            return this;
+        }
         @Override
         protected Builder self() {
             return this;

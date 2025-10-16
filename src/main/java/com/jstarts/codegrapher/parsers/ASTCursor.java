@@ -4,7 +4,9 @@ import ch.usi.si.seart.treesitter.Node;
 import ch.usi.si.seart.treesitter.Tree;
 import ch.usi.si.seart.treesitter.TreeCursor;
 import ch.usi.si.seart.treesitter.TreeCursorNode;
+import lombok.Data;
 
+@Data
 public class ASTCursor implements AutoCloseable {
     private final TreeCursor cursor;
 
