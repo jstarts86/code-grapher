@@ -37,7 +37,8 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
     @Override
     public Optional<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
         return Optional.ofNullable(node.getChildByFieldName("name"))
-                .flatMap(nameNode -> buildClassEntity(nameNode, node, context, filePath, sourceCode));
+                .flatMap(nameNode -> buildClassEntity(nameNode, node, context, filePath, sourceCode))
+                .map(e -> (CodeEntity) e);
     }
 
     private Optional<ClassEntity> buildClassEntity(Node nameNode, Node classNode, ExtractionContext context,
@@ -60,7 +61,6 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
         } catch (Exception e) {
             return Optional.empty();
         }
-
     }
 
     private SourceLocation buildLocation(String filePath, Node nameNode) {

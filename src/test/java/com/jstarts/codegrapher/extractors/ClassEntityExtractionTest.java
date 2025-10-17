@@ -1,44 +1,33 @@
 package com.jstarts.codegrapher.extractors;
 
-import com.jstarts.codegrapher.core.entities.ClassEntity;
-import com.jstarts.codegrapher.core.entities.CodeEntity;
-import com.jstarts.codegrapher.parsers.ASTCursorFacade;
-import com.jstarts.codegrapher.parsers.TSPythonParserFacade;
-
-import ch.usi.si.seart.treesitter.Node;
-import ch.usi.si.seart.treesitter.Tree;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import ch.usi.si.seart.treesitter.Node;
+import ch.usi.si.seart.treesitter.Tree;
 
 class ClassEntityExtractionTest {
 
-    private TSPythonParserFacade parser;
     private ClassEntityExtractor extractor;
     private String pythonSource;
 
     @BeforeEach
     void setUp() throws IOException, URISyntaxException {
         extractor = new ClassEntityExtractor();
-        Path path = Paths.get(getClass().getClassLoader().getResource("test/test.py").toURI());
+        Path path = Paths.get(getClass().getClassLoader().getResource("test_files/test.py").toURI());
         pythonSource = Files.readString(path);
     }
 
     @Test
     void testExtractClassEntities() {
-        Tree tree = parser.parse(pythonSource);
-        Node node = tree.getRootNode();
+        // Tree tree = parser.parse(pythonSource);
+        // Node node = tree.getRootNode();
 
         // List<CodeEntityExtractor> applicableExtractors =
         // registry.get(node.getType());

@@ -9,9 +9,10 @@ import java.util.Set;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public abstract class CodeEntity {
     protected final String id;
     protected final String name;
@@ -23,7 +24,7 @@ public abstract class CodeEntity {
         String content = String.format("%s:%d:%d:%d:%d",
                 location.filePath(), location.startLine(), location.endLine(),
                 location.startCol(), location.endCol());
-        return DigestUtils.sha256Hex(content).substring(0,0);
+        return DigestUtils.sha256Hex(content).substring(0, 16);
     }
 
     protected CodeEntity(Builder<?> builder) {

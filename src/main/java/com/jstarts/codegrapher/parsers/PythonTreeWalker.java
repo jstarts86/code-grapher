@@ -34,16 +34,6 @@ public class PythonTreeWalker {
             CodeEntity entity = extracted.get();
             context.pushContext(entity);
         }
-        // registry.getExtractor(node.getType())
-        // .ifPresentOrElse(
-        // extractor -> {
-        // extractor.extract(node, context, sourceFilePath, sourceCode)
-        // .ifPresent(entity -> context.pushContext(entity));
-        // },
-        // () -> {
-        // System.err.print(
-        // "No extractor found for type" + node.getType());
-        // });
         for (int i = 0; i < node.getChildCount(); i++) {
             walk(node.getChild(i));
         }
