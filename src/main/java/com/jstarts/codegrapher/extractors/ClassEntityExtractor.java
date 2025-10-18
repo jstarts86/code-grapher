@@ -1,18 +1,13 @@
 package com.jstarts.codegrapher.extractors;
 
 import java.io.IOException;
-import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
-
-import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import com.jstarts.codegrapher.core.entities.ClassEntity;
 import com.jstarts.codegrapher.core.entities.CodeEntity;
 import com.jstarts.codegrapher.core.entities.CodeEntityType;
@@ -27,11 +22,7 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
 
     @Override
     public boolean canHandle(String nodeType) {
-        if (nodeType.equals("class_definition")) {
-            return true;
-        } else {
-            return false;
-        }
+        return "class_definition".equals(nodeType);
     }
 
     @Override

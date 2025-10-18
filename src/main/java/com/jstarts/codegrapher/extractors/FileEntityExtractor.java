@@ -14,11 +14,7 @@ public class FileEntityExtractor implements CodeEntityExtractor {
 
     @Override
     public boolean canHandle(String nodeType) {
-        if (nodeType.equals("module")) {
-            return true;
-        } else {
-            return false;
-        }
+        return "module".equals(nodeType);
     }
 
     @Override
