@@ -11,7 +11,7 @@ public interface CodeEntityExtractor {
 
     Optional<CodeEntity> extract(Node node, ExtractionContext context, String sourceFilePath, String sourceCode);
 
-    private SourceLocation buildLocation(String filePath, Node node) {
+    default SourceLocation buildLocation(String filePath, Node node) {
         return SourceLocation.builder()
                 .filePath(filePath)
                 .startLine(node.getStartPoint().getRow() + 1)

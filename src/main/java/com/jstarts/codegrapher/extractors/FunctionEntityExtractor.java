@@ -22,16 +22,26 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                 .map(entity -> (CodeEntity) entity);
     }
 
-    private Optional<CodeEntity> buildFunctionEntity(Node node, ExtractionContext context, String filePath) {
-        String fileName = Paths.get(filePath).getFileName().toString();
-        SourceLocation location = buildLocation(filePath, node);
-        return null;
+    private Optional<CodeEntity> buildFunctionEntity(Node nameNode, Node functionNode, ExtractionContext context,
+            String filePath, String sourceCode) {
+        try {
+            String name = sourceCode.substring(nameNode.getStartByte(), nameNode.getEndByte());
+            SourceLocation location = buildLocation(filePath, functionNode);
+
+        } catch (Exception e) {
+            // TODO: handle exception
+
+        }
     }
 
-    private List<String> extractTypeParameters(Node functionNode, String sourceCode) {
-        return Optional.ofNullable(functionNode.getChildByFieldName("type_parameters"))
-                .map(Node::getChildren)
-    }
+    private Optional<boolean> extractIsAsync(Node functionNode,)
+
+    // private List<String> extractTypeParameters(Node functionNode, String
+    // sourceCode) {
+    // return
+    // Optional.ofNullable(functionNode.getChildByFieldName("type_parameters"))
+    // .map(Node::getChildren)
+    // }
 
     private SourceLocation buildLocation(String filePath, Node node) {
         return SourceLocation.builder()

@@ -36,9 +36,8 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
             String filePath, String sourceCode) {
         try {
             String className = sourceCode.substring(nameNode.getStartByte(), nameNode.getEndByte());
-            SourceLocation location = buildLocation(filePath, nameNode);
+            SourceLocation location = buildLocation(filePath, classNode);
             List<String> superClasses = extractSuperClasses(classNode, sourceCode);
-            List<String> typeParameters = extractTypeParameters(classNode, sourceCode);
             ClassEntity classEntity = new ClassEntity.Builder()
                     .name(className)
                     .id(CodeEntity.generateId(location))
@@ -46,7 +45,6 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
                     .parentId(context.peekContext().getId())
                     .superClasses(superClasses)
                     .type(CodeEntityType.CLASS)
-                    .types(typeParameters)
                     .build();
             return Optional.of(classEntity);
         } catch (Exception e) {
@@ -54,17 +52,6 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
         }
     }
 
-    private SourceLocation buildLocation(String filePath, Node nameNode) {
-        return SourceLocation.builder()
-                .filePath(filePath)
-                .startLine(nameNode.getStartPoint().getRow() + 1)
-                .endLine(nameNode.getEndPoint().getRow() + 1)
-                .startByte(nameNode.getStartByte())
-                .endByte(nameNode.getEndByte())
-                .startCol(nameNode.getStartPoint().getColumn())
-                .endCol(nameNode.getEndPoint().getColumn())
-                .build();
-    }
 
     // (class_definition ; [52, 0] - [64, 45]
     // name: (identifier) ; [52, 6] - [52, 12]
@@ -82,15 +69,6 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
         // .map(child -> sourceCode.substring(child.getStartByte(), child.getEndByte()))
         // .toList())
 
-    }
-
-    private List<String> extractTypeParameters(Node classNode, String sourceCode) {
-        return Optional.ofNullable(classNode.getChildByFieldName("type_parameters"))
-                .map(Node::getChildren)
-                .map(children -> children.stream()
-                        .map(child -> sourceCode.substring(child.getStartByte(), child.getEndByte()))
-                        .toList())
-                .orElse(List.of());
     }
 
     public static void main(String[] args) throws IOException {

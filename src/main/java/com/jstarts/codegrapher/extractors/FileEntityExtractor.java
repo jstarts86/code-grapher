@@ -22,7 +22,6 @@ public class FileEntityExtractor implements CodeEntityExtractor {
         return buildFileEntity(node, context, filePath)
                 .map(entity -> (CodeEntity) entity);
     }
-
     private Optional<FileEntity> buildFileEntity(Node node, ExtractionContext context, String filePath) {
         try {
             String fileName = Paths.get(filePath).getFileName().toString();
@@ -42,16 +41,5 @@ public class FileEntityExtractor implements CodeEntityExtractor {
 
     }
 
-    private SourceLocation buildLocation(String filePath, Node fileNode) {
-        return SourceLocation.builder()
-                .filePath(filePath)
-                .startLine(fileNode.getStartPoint().getRow() + 1)
-                .endLine(fileNode.getEndPoint().getRow() + 1)
-                .startByte(fileNode.getStartByte())
-                .endByte(fileNode.getEndByte())
-                .startCol(fileNode.getStartPoint().getColumn())
-                .endCol(fileNode.getEndPoint().getColumn())
-                .build();
-    }
 
 }

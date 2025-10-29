@@ -4,12 +4,11 @@ import java.util.Map;
 
 public record PythonType(
 
-    String name,
-    String module,
-    boolean isBuiltin,
-    boolean isCollection,
-    Map<String, PythonType> generis
-) {
+        String name,
+        String module,
+        boolean isBuiltin,
+        boolean isCollection,
+        Map<String, PythonType> generics) {
     public static PythonType of(String name) {
         return new PythonType(name, null, true, false, Map.of());
     }
