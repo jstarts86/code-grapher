@@ -23,4 +23,13 @@ public interface CodeEntityExtractor {
                 .build();
     }
 
+    default Optional<String> extractField(Node node, String fieldName, String sourceCode) {
+        return Optional.ofNullable(node.getChildByFieldName(fieldName))
+            .map(child -> sourceCode.substring(child.getStartByte(),child.getEndByte()));
+    }
+
+    default String extractText(Node node, String sourceCode) {
+        return sourceCode.substring(node.getStartByte(),node.getEndByte());
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.jstarts.codegrapher.core.entities;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,9 +24,21 @@ public class FunctionEntity extends CodeEntity {
     @Getter
     @AllArgsConstructor
     public static class Parameter {
+        private final ParameterKind kind;
         private final String name;
-        private final String typeAnnotation;
-        private final String defaultValue;
+        private final Optional<String> typeAnnotation;
+        private final Optional<String> defaultValue;
+    }
+
+    public enum ParameterKind {
+        NORMAL,
+        TYPED,
+        DEFAULT,
+        TYPED_DEFAULT,
+        LIST_SPLAT,
+        DICT_SPLAT,
+        POSITIONAL_SEPARATOR,
+        KEYWORD_SEPARATOR
     }
 
     public static class Builder extends CodeEntity.Builder<Builder> {

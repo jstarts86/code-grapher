@@ -52,7 +52,6 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
         }
     }
 
-
     // (class_definition ; [52, 0] - [64, 45]
     // name: (identifier) ; [52, 6] - [52, 12]
     // superclasses: (argument_list ; [52, 12] - [52, 28]

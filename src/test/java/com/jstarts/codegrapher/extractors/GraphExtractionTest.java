@@ -19,16 +19,16 @@ public class GraphExtractionTest {
         LibraryLoader.load();
     }
 
+    void runFunctionExtractorManually() throws Exception {
+        GraphExtractionTest.main(new String[0]);
+    }
+
     public static void main(String[] args) throws IOException {
         // 1. Load test file
 
-        String pythonSource;
-        try (var stream = ClassLoader.getSystemResourceAsStream("test_files/class.py")) {
-            pythonSource = new String(
-                    Objects.requireNonNull(stream).readAllBytes(),
-                    StandardCharsets.UTF_8);
-        }
         // 2. Parse with Tree-sitter
+        Path path = Path.of("src/test/resources/test_files/function.py");
+        String pythonSource = Files.readString(path);
         Parser parser = Parser.getFor(Language.PYTHON);
         Tree tree = parser.parse(pythonSource);
 
@@ -36,19 +36,21 @@ public class GraphExtractionTest {
         ExtractorRegistry registry = new ExtractorRegistry();
         registry.register("module", new FileEntityExtractor());
         registry.register("class_declaration", new ClassEntityExtractor());
+        registry.register("function_definition", new FunctionEntityExtractor());
 
         // 4. Walk the tree
         ExtractionContext context = new ExtractionContext();
         PythonTreeWalker walker = new PythonTreeWalker(
                 registry,
                 context,
-                "src/test/resources/test.py",
+                "src/test/resources/test_files/function.py",
                 pythonSource);
 
         walker.walk(tree.getRootNode());
+        System.out.print(walker.getContext().getAllEntities());
 
         // 5. Print results
-        printExtractedEntities(context);
+        // printExtractedEntities(context);
     }
 
     private static void printExtractedEntities(ExtractionContext context) {

@@ -1,3 +1,6 @@
+def f10(a, b: int, c=42, d: str = "x", /, e, *, f: float, g=(1, 2), *args, **kwargs):
+    pass
+
 def greet():
     print("Hello")
 
