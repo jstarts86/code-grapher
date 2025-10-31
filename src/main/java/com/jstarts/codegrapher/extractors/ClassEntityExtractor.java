@@ -26,10 +26,11 @@ public class ClassEntityExtractor implements CodeEntityExtractor {
     }
 
     @Override
-    public Optional<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
+    public List<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
         return Optional.ofNullable(node.getChildByFieldName("name"))
                 .flatMap(nameNode -> buildClassEntity(nameNode, node, context, filePath, sourceCode))
-                .map(e -> (CodeEntity) e);
+                .<List<CodeEntity>>map(List::of)
+                .orElse(List.of());
     }
 
     private Optional<ClassEntity> buildClassEntity(Node nameNode, Node classNode, ExtractionContext context,

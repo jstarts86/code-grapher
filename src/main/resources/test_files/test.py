@@ -1,5 +1,8 @@
 """A small but expressive test file for the Code Grapher tool."""
 
+import numpy as np
+from pathlib import Path, PurePath
+from .. import utils
 import os
 import sys as system
 from functools import lru_cache

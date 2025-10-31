@@ -27,6 +27,10 @@ public class ExtractionContext {
         allExtractedEntities.add(codeEntity);
     }
 
+    public void addEntity(CodeEntity e) {
+        allExtractedEntities.add(e);
+    }
+
     /**
      * Return the current parent (top of stack) without removing it.
      */
