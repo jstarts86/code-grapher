@@ -2,6 +2,9 @@ package com.jstarts.codegrapher.core.entities;
 
 import java.util.Map;
 
+import lombok.ToString;
+
+@ToString
 public class FileEntity extends CodeEntity {
     private final String moduleName;
 

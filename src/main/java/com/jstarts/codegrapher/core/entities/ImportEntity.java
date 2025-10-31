@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Represents a single import statement in a Python file.
@@ -15,6 +16,7 @@ import lombok.Getter;
  *   from .. import utils
  */
 @Getter
+@ToString
 public class ImportEntity extends CodeEntity {
 
     private final String fromModule;              // e.g. "pathlib" or null for plain import
@@ -87,16 +89,16 @@ public class ImportEntity extends CodeEntity {
         }
     }
 
-    @Override
-    public String toString() {
-        String base = isFromImport
-                ? String.format("from %s import %s", 
-                    fromModule != null ? fromModule : "", 
-                    importedNames != null ? importedNames : "")
-                : String.format("import %s", importedNames);
-        if (aliases != null && !aliases.isEmpty()) {
-            base += " as " + aliases;
-        }
-        return base;
-    }
+    // @Override
+    // public String toString() {
+    //     String base = isFromImport
+    //             ? String.format("from %s import %s", 
+    //                 fromModule != null ? fromModule : "", 
+    //                 importedNames != null ? importedNames : "")
+    //             : String.format("import %s", importedNames);
+    //     if (aliases != null && !aliases.isEmpty()) {
+    //         base += " as " + aliases;
+    //     }
+    //     return base;
+    // }
 }

@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import org.junit.jupiter.api.Test;
+
 import com.jstarts.codegrapher.parsers.PythonTreeWalker;
 
 import ch.usi.si.seart.treesitter.Language;
@@ -19,35 +21,42 @@ public class GraphExtractionTest {
         LibraryLoader.load();
     }
 
+    @Test
     void runFunctionExtractorManually() throws Exception {
         GraphExtractionTest.main(new String[0]);
     }
 
     public static void main(String[] args) throws IOException {
-        // 1. Load test file
+        // Load test file
 
-        // 2. Parse with Tree-sitter
-        Path path = Path.of("src/test/resources/test_files/function.py");
+        // Parse with Tree-sitter
+        Path path = Path.of("src/test/resources/test_files/test.py");
+        System.out.println("[DEBUG] Absolute path: " + path.toAbsolutePath());
+        System.out.println("[DEBUG] Exists: " + Files.exists(path));
         String pythonSource = Files.readString(path);
         Parser parser = Parser.getFor(Language.PYTHON);
         Tree tree = parser.parse(pythonSource);
 
-        // 3. Set up extractors
+        // Set up extractors
         ExtractorRegistry registry = new ExtractorRegistry();
         registry.register("module", new FileEntityExtractor());
         registry.register("class_declaration", new ClassEntityExtractor());
         registry.register("function_definition", new FunctionEntityExtractor());
+        registry.register("import_statement", new ImportEntityExtractor());
+        registry.register("import_from_statement", new ImportEntityExtractor());
 
-        // 4. Walk the tree
+        // Walk the tree
         ExtractionContext context = new ExtractionContext();
         PythonTreeWalker walker = new PythonTreeWalker(
                 registry,
                 context,
-                "src/test/resources/test_files/function.py",
+                "src/test/resources/test_files/test.py",
                 pythonSource);
 
         walker.walk(tree.getRootNode());
-        System.out.print(walker.getContext().getAllEntities());
+        context.getAllEntities().forEach(entity -> {
+            System.out.println(entity);
+        });
 
         // 5. Print results
         // printExtractedEntities(context);

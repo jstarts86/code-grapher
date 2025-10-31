@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 public class FunctionEntity extends CodeEntity {
 
     private final boolean isAsync;
@@ -23,6 +25,7 @@ public class FunctionEntity extends CodeEntity {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class Parameter {
         private final ParameterKind kind;
         private final String name;

@@ -5,7 +5,10 @@ import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+import lombok.ToString;
+
 @JsonDeserialize(builder = ClassEntity.Builder.class)
+@ToString
 public class ClassEntity extends CodeEntity {
     private final List<String> superClasses;
 

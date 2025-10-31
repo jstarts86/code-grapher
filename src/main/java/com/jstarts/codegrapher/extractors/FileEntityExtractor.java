@@ -1,6 +1,7 @@
 package com.jstarts.codegrapher.extractors;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import com.jstarts.codegrapher.core.entities.CodeEntity;
@@ -18,10 +19,12 @@ public class FileEntityExtractor implements CodeEntityExtractor {
     }
 
     @Override
-    public Optional<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
+    public List<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
         return buildFileEntity(node, context, filePath)
-                .map(entity -> (CodeEntity) entity);
+                .<List<CodeEntity>>map(List::of)
+                .orElse(List.of());
     }
+
     private Optional<FileEntity> buildFileEntity(Node node, ExtractionContext context, String filePath) {
         try {
             String fileName = Paths.get(filePath).getFileName().toString();
@@ -40,6 +43,5 @@ public class FileEntityExtractor implements CodeEntityExtractor {
         }
 
     }
-
 
 }
