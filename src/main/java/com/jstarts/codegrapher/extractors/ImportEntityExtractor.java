@@ -119,10 +119,6 @@ public class ImportEntityExtractor implements CodeEntityExtractor {
         }
     }
 
-    /**
-     * Extracts all imported items (names and aliases) from an import statement.
-     * Handles both plain imports and from-imports.
-     */
     private void extractImportedItems(
             Node node,
             String sourceCode,
@@ -136,9 +132,6 @@ public class ImportEntityExtractor implements CodeEntityExtractor {
         }
     }
 
-    /**
-     * Recursively processes import items, handling dotted_name, aliased_import, etc.
-     */
     private void processImportItem(
             Node node,
             String sourceCode,

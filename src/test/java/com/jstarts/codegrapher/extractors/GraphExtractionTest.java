@@ -30,7 +30,7 @@ public class GraphExtractionTest {
         // Load test file
 
         // Parse with Tree-sitter
-        Path path = Path.of("src/test/resources/test_files/test.py");
+        Path path = Path.of("src/test/resources/test_files/imports.py");
         System.out.println("[DEBUG] Absolute path: " + path.toAbsolutePath());
         System.out.println("[DEBUG] Exists: " + Files.exists(path));
         String pythonSource = Files.readString(path);
