@@ -1,19 +1,18 @@
 package com.jstarts.codegrapher.extractors;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import ch.usi.si.seart.treesitter.Node;
 import com.jstarts.codegrapher.core.entities.CodeEntity;
 import com.jstarts.codegrapher.core.entities.CodeEntityType;
 import com.jstarts.codegrapher.core.entities.ImportEntity;
 import com.jstarts.codegrapher.core.entities.SourceLocation;
 
-import ch.usi.si.seart.treesitter.Node;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ImportEntityExtractor implements CodeEntityExtractor {
+
     private static final String IMPORT_STATEMENT = "import_statement";
     private static final String IMPORT_FROM_STATEMENT = "import_from_statement";
 
@@ -22,220 +21,172 @@ public class ImportEntityExtractor implements CodeEntityExtractor {
         return IMPORT_STATEMENT.equals(nodeType) || IMPORT_FROM_STATEMENT.equals(nodeType);
     }
 
-
-    // private final String fromModule;              // e.g. "pathlib" or null for plain import
-    // private final boolean isFromImport;           // true if "from X import Y"
-    // private final boolean isRelative;             // true if relative import ("from ..foo import bar")
-    // private final int relativeLevel;              // number of leading dots for relative imports
-    // private final List<String> importedNames;     // e.g. ["Path", "PurePath"] or ["os"]
-    // private final Map<String, String> aliases;    // alias -> full name, e.g. { "np" : "numpy" }
-
-//    (import_statement ; [2, 0] - [2, 18]
-//      name: (aliased_import ; [2, 7] - [2, 18]
-//        name: (dotted_name ; [2, 7] - [2, 12]
-//          (identifier)) ; [2, 7] - [2, 12]
-//        alias: (identifier))) ; [2, 16] - [2, 18]
-//    (import_from_statement ; [3, 0] - [3, 34]
-//      module_name: (dotted_name ; [3, 5] - [3, 12]
-//        (identifier)) ; [3, 5] - [3, 12]
-//      name: (dotted_name ; [3, 20] - [3, 24]
-//        (identifier)) ; [3, 20] - [3, 24]
-//      name: (dotted_name ; [3, 26] - [3, 34]
-//        (identifier))) ; [3, 26] - [3, 34]
-//    (import_from_statement ; [4, 0] - [4, 20]
-//      module_name: (relative_import ; [4, 5] - [4, 7]
-//        (import_prefix)) ; [4, 5] - [4, 7]
-//      name: (dotted_name ; [4, 15] - [4, 20]
-//        (identifier))) ; [4, 15] - [4, 20]
-// import numpy as np
-// from pathlib import Path, PurePath
-// from .. import utils
-
     @Override
     public List<CodeEntity> extract(Node node, ExtractionContext context, String sourceFilePath, String sourceCode) {
+        return buildImportEntity(node, context, sourceFilePath, sourceCode)
+                .map(entity -> (CodeEntity) entity)
+                .map(List::of)
+                .orElse(List.of());
+    }
+
+    private Optional<ImportEntity> buildImportEntity(
+            Node node,
+            ExtractionContext context,
+            String sourceFilePath,
+            String sourceCode
+    ) {
         try {
             boolean isFromImport = IMPORT_FROM_STATEMENT.equals(node.getType());
             
-            String fromModule = null;
-            boolean isRelative = false;
-            int relativeLevel = 0;
-            List<String> importedNames = new ArrayList<>();
-            Map<String, String> aliases = new LinkedHashMap<>();
-
-            if (isFromImport) {
-                // Extract "from X" part
-                Optional<String> moduleNameOpt = extractField(node, "module_name", sourceCode);
-                if (moduleNameOpt.isPresent()) {
-                    String rawModule = moduleNameOpt.get();
-                    
-                    // Check if relative import (starts with dots)
-                    if (rawModule.startsWith(".")) {
-                        isRelative = true;
-                        relativeLevel = countLeadingDots(rawModule);
-                        fromModule = rawModule.substring(relativeLevel);
-                        if (fromModule.isEmpty()) {
-                            fromModule = null; // purely relative: "from .. import X"
-                        }
-                    } else {
-                        fromModule = rawModule;
-                    }
-                }
-                
-                // Extract imported names
-                extractImportedItems(node, sourceCode, importedNames, aliases);
-                
-            } else {
-                // Plain "import X, Y as Z" statement
-                extractImportedItems(node, sourceCode, importedNames, aliases);
-            }
-
-            // Build location
+            ModuleInfo moduleInfo = isFromImport 
+                ? extractModuleInfo(node, sourceCode)
+                : ModuleInfo.empty();
+            
+            ImportItems items = extractImportItems(node, sourceCode);
             SourceLocation location = buildLocation(sourceFilePath, node);
-
-            // Build display name
-            String displayName = buildDisplayName(isFromImport, fromModule, importedNames, aliases);
-
-            // Build entity
-            ImportEntity entity = new ImportEntity.Builder()
+            String displayName = buildDisplayName(isFromImport, moduleInfo, items);
+            
+            return Optional.of(new ImportEntity.Builder()
                     .id(CodeEntity.generateId(location))
                     .name(displayName)
                     .type(CodeEntityType.IMPORT)
                     .location(location)
-                    .parentId(context.peekContext() != null ? context.peekContext().getId() : null)
-                    .fromModule(fromModule)
+                    .parentId(Optional.ofNullable(context.peekContext())
+                            .map(CodeEntity::getId)
+                            .orElse(null))
+                    .fromModule(moduleInfo.module)
                     .isFromImport(isFromImport)
-                    .isRelative(isRelative)
-                    .relativeLevel(relativeLevel)
-                    .importedNames(importedNames)
-                    .aliases(aliases)
-                    .build();
-
-            return List.of(entity);
-
+                    .isRelative(moduleInfo.isRelative)
+                    .relativeLevel(moduleInfo.relativeLevel)
+                    .importedNames(items.names)
+                    .aliases(items.aliases)
+                    .build());
+                    
         } catch (Exception e) {
             System.err.println("Failed to extract import from " + sourceFilePath + ": " + e.getMessage());
-            e.printStackTrace();
-            return List.of();
+            return Optional.empty();
         }
     }
 
-    private void extractImportedItems(
-            Node node,
-            String sourceCode,
-            List<String> namesOut,
-            Map<String, String> aliasesOut
-    ) {
-        // Look for all named children
-        for (int i = 0; i < node.getNamedChildCount(); i++) {
-            Node child = node.getNamedChild(i);
-            processImportItem(child, sourceCode, namesOut, aliasesOut);
+    // Immutable data holders
+    
+    private record ModuleInfo(String module, boolean isRelative, int relativeLevel) {
+        static ModuleInfo empty() {
+            return new ModuleInfo(null, false, 0);
         }
     }
-
-    private void processImportItem(
-            Node node,
-            String sourceCode,
-            List<String> namesOut,
-            Map<String, String> aliasesOut
-    ) {
-        String nodeType = node.getType();
-
-        switch (nodeType) {
-            case "dotted_name":
-            case "identifier":
-                // Simple import: "import os" or "from X import Path"
-                String name = extractText(node, sourceCode);
-                namesOut.add(name);
-                break;
-
-            case "aliased_import":
-                // Aliased import: "import numpy as np" or "from X import Y as Z"
-                handleAliasedImport(node, sourceCode, namesOut, aliasesOut);
-                break;
-
-            case "wildcard_import":
-                // "from X import *"
-                namesOut.add("*");
-                break;
-
-            default:
-                // Recursively check children (e.g., inside parentheses or comma-separated lists)
-                for (int i = 0; i < node.getNamedChildCount(); i++) {
-                    processImportItem(node.getNamedChild(i), sourceCode, namesOut, aliasesOut);
-                }
-                break;
+    
+    private record ImportItems(List<String> names, Map<String, String> aliases) {
+        ImportItems(List<String> names, Map<String, String> aliases) {
+            this.names = List.copyOf(names);
+            this.aliases = Map.copyOf(aliases);
         }
     }
-
-    /**
-     * Handles aliased imports: "X as Y"
-     * Extracts both the original name and the alias.
-     */
-    private void handleAliasedImport(
-            Node node,
-            String sourceCode,
-            List<String> namesOut,
-            Map<String, String> aliasesOut
-    ) {
-        // Tree structure: aliased_import has two named children
-        // First child: name (dotted_name or identifier)
-        // Second child: alias (identifier)
+    
+    private record ImportItem(String name, Optional<String> alias) {
+        static ImportItem simple(String name) {
+            return new ImportItem(name, Optional.empty());
+        }
         
-        Node nameNode = node.getNamedChild(0);
-        Node aliasNode = node.getNamedChild(1);
-
-        if (nameNode != null && aliasNode != null) {
-            String originalName = extractText(nameNode, sourceCode);
-            String alias = extractText(aliasNode, sourceCode);
-            
-            namesOut.add(alias);  // Use alias as the primary name
-            aliasesOut.put(alias, originalName);  // Map alias back to original
+        static ImportItem aliased(String name, String alias) {
+            return new ImportItem(name, Optional.of(alias));
         }
     }
 
-    /**
-     * Counts leading dots in a string (for relative imports).
-     */
+    // Pure Extraction Functions
+
+    private ModuleInfo extractModuleInfo(Node node, String sourceCode) {
+        return extractField(node, "module_name", sourceCode)
+                .map(rawModule -> {
+                    if (rawModule.startsWith(".")) {
+                        int level = countLeadingDots(rawModule);
+                        String module = rawModule.substring(level);
+                        return new ModuleInfo(
+                            module.isEmpty() ? null : module,
+                            true,
+                            level
+                        );
+                    }
+                    return new ModuleInfo(rawModule, false, 0);
+                })
+                .orElse(ModuleInfo.empty());
+    }
+
+    private ImportItems extractImportItems(Node node, String sourceCode) {
+        List<ImportItem> items = streamNamedChildren(node)
+                .flatMap(child -> processImportItem(child, sourceCode))
+                .toList();
+        
+        List<String> names = items.stream()
+                .map(item -> item.alias().orElse(item.name()))
+                .toList();
+        
+        Map<String, String> aliases = items.stream()
+                .filter(item -> item.alias().isPresent())
+                .collect(Collectors.toMap(
+                    item -> item.alias().get(),
+                    ImportItem::name,
+                    (a, b) -> a,
+                    LinkedHashMap::new
+                ));
+        
+        return new ImportItems(names, aliases);
+    }
+
+    private Stream<ImportItem> processImportItem(Node node, String sourceCode) {
+        return switch (node.getType()) {
+            case "dotted_name", "identifier" -> 
+                Stream.of(ImportItem.simple(extractText(node, sourceCode)));
+                
+            case "aliased_import" -> 
+                handleAliasedImport(node, sourceCode);
+                
+            case "wildcard_import" -> 
+                Stream.of(ImportItem.simple("*"));
+                
+            default -> 
+                streamNamedChildren(node)
+                    .flatMap(child -> processImportItem(child, sourceCode));
+        };
+    }
+
+    private Stream<ImportItem> handleAliasedImport(Node node, String sourceCode) {
+        return Optional.ofNullable(node.getNamedChild(0))
+                .flatMap(nameNode -> Optional.ofNullable(node.getNamedChild(1))
+                    .map(aliasNode -> ImportItem.aliased(
+                        extractText(nameNode, sourceCode),
+                        extractText(aliasNode, sourceCode)
+                    )))
+                .stream();
+    }
+
+    private Stream<Node> streamNamedChildren(Node node) {
+        return IntStream.range(0, node.getNamedChildCount())
+                .mapToObj(node::getNamedChild);
+    }
+
     private int countLeadingDots(String s) {
-        int count = 0;
-        for (char c : s.toCharArray()) {
-            if (c == '.') {
-                count++;
-            } else {
-                break;
-            }
-        }
-        return count;
+        return (int) s.chars()
+                .takeWhile(c -> c == '.')
+                .count();
     }
 
-    /**
-     * Builds a human-readable display name for the import.
-     */
     private String buildDisplayName(
             boolean isFromImport,
-            String fromModule,
-            List<String> names,
-            Map<String, String> aliases
+            ModuleInfo moduleInfo,
+            ImportItems items
     ) {
         if (isFromImport) {
-            String moduleStr = fromModule != null ? fromModule : "...";
-            String namesStr = String.join(", ", names);
-            return String.format("from %s import %s", moduleStr, namesStr);
-        } else {
-            // For plain imports, show aliases if present
-            List<String> displayParts = new ArrayList<>();
-            for (String name : names) {
-                if (aliases.containsKey(name)) {
-                    displayParts.add(aliases.get(name) + " as " + name);
-                } else {
-                    displayParts.add(name);
-                }
-            }
-            return "import " + String.join(", ", displayParts);
+            String moduleStr = Optional.ofNullable(moduleInfo.module()).orElse("...");
+            return String.format("from %s import %s", moduleStr, String.join(", ", items.names()));
         }
+        
+        String importList = items.names().stream()
+                .map(name -> items.aliases().containsKey(name)
+                    ? items.aliases().get(name) + " as " + name
+                    : name)
+                .collect(Collectors.joining(", "));
+                
+        return "import " + importList;
     }
-
-
-
-    
 }
