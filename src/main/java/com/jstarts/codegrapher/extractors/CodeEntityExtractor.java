@@ -1,0 +1,36 @@
+package com.jstarts.codegrapher.extractors;
+
+import java.util.List;
+import java.util.Optional;
+import com.jstarts.codegrapher.core.entities.CodeEntity;
+import com.jstarts.codegrapher.core.entities.SourceLocation;
+
+import ch.usi.si.seart.treesitter.Node;
+
+public interface CodeEntityExtractor {
+    boolean canHandle(String nodeType);
+
+    List<CodeEntity> extract(Node node, ExtractionContext context, String sourceFilePath, String sourceCode);
+
+    default SourceLocation buildLocation(String filePath, Node node) {
+        return SourceLocation.builder()
+                .filePath(filePath)
+                .startLine(node.getStartPoint().getRow() + 1)
+                .endLine(node.getEndPoint().getRow() + 1)
+                .startByte(node.getStartByte())
+                .endByte(node.getEndByte())
+                .startCol(node.getStartPoint().getColumn())
+                .endCol(node.getEndPoint().getColumn())
+                .build();
+    }
+
+    default Optional<String> extractField(Node node, String fieldName, String sourceCode) {
+        return Optional.ofNullable(node.getChildByFieldName(fieldName))
+            .map(child -> sourceCode.substring(child.getStartByte(),child.getEndByte()));
+    }
+
+    default String extractText(Node node, String sourceCode) {
+        return sourceCode.substring(node.getStartByte(),node.getEndByte());
+    }
+
+}
