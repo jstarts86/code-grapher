@@ -1,14 +1,13 @@
 package com.jstarts.codegrapher;
 
-import ch.usi.si.seart.treesitter.Language;
-import ch.usi.si.seart.treesitter.LibraryLoader;
-import ch.usi.si.seart.treesitter.Parser;
-import ch.usi.si.seart.treesitter.Tree;
-import ch.usi.si.seart.treesitter.printer.TreePrinter;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.falkordb.ResultSet;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jstarts.codegrapher.core.entities.CodeEntity;
 import com.jstarts.codegrapher.extractors.ClassEntityExtractor;
 import com.jstarts.codegrapher.extractors.ExtractionContext;
@@ -16,16 +15,10 @@ import com.jstarts.codegrapher.extractors.ExtractorRegistry;
 import com.jstarts.codegrapher.extractors.FileEntityExtractor;
 import com.jstarts.codegrapher.parsers.PythonTreeWalker;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import ch.usi.si.seart.treesitter.Language;
+import ch.usi.si.seart.treesitter.LibraryLoader;
+import ch.usi.si.seart.treesitter.Parser;
+import ch.usi.si.seart.treesitter.Tree;
 
 public class Main {
     static {
