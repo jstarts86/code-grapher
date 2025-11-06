@@ -6,6 +6,8 @@ def greet():
 
 
 def add(x, y):
+    z = 10
+    y.help()
     return x + y
 
 

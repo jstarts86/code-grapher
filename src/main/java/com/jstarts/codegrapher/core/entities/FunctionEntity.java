@@ -50,7 +50,7 @@ public class FunctionEntity extends CodeEntity {
         private List<Parameter> parameters;
         private List<String> typeParameters;
 
-        public Builder isAsync(Boolean isAsync) {
+        public Builder isAsync(boolean isAsync) {
             this.isAsync = isAsync;
             return this;
         }
