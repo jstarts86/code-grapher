@@ -12,8 +12,7 @@ import java.util.*;
  */
 public class VariableEntityExtractor implements CodeEntityExtractor {
 
-    private static final Set<String> SUPPORTED_TYPES =
-            Set.of("assignment", "typed_assignment");
+    private static final Set<String> SUPPORTED_TYPES = Set.of("assignment", "typed_assignment");
 
     @Override
     public boolean canHandle(String nodeType) {
@@ -28,10 +27,15 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
             String sourceCode) {
 
         List<CodeEntity> vars = new ArrayList<>();
+        CodeEntity currentParent = context.peekContext();
+        if (currentParent.getType() == CodeEntityType.CLASS) {
+            return List.of();
+        }
 
         // LHS extraction
         Node left = node.getChildByFieldName("left");
-        if (left == null) return vars;
+        if (left == null)
+            return vars;
 
         List<Node> identifiers = new ArrayList<>();
         collectIdentifiers(left, identifiers);
@@ -69,7 +73,8 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
      * of an assignment (e.g., x, y, z in "x, (y, z) = foo()").
      */
     private void collectIdentifiers(Node node, List<Node> collected) {
-        if (node == null) return;
+        if (node == null)
+            return;
         switch (node.getType()) {
             case "identifier" -> collected.add(node);
             case "tuple", "list" -> {
@@ -77,7 +82,8 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                     collectIdentifiers(node.getChild(i), collected);
                 }
             }
-            default -> { /* ignore */ }
+            default -> {
+                /* ignore */ }
         }
     }
 }

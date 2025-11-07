@@ -24,23 +24,26 @@ public class PythonTreeWalker {
     private final String sourceCode;
 
     public void walk(Node node) {
-
         if (node == null) {
             return;
         }
-        List<CodeEntity> extracted = registry.getExtractor(node.getType())
-                .map(extractor -> extractor.extract(node, context, sourceFilePath, sourceCode))
-                .orElse(List.of());
+
+        // Get all extractors registered for this node type
+        List<CodeEntity> extracted = new ArrayList<>();
+        for (var extractor : registry.getExtractors(node.getType())) {
+            extracted.addAll(extractor.extract(node, context, sourceFilePath, sourceCode));
+        }
+
         // Track which entities are scoped (need push/pop)
         List<CodeEntity> scopedEntities = new ArrayList<>();
 
         // Process each extracted entity
         for (CodeEntity entity : extracted) {
-            context.addEntity(entity); // Always add to collection
-
             if (isScoped(entity)) {
-                context.pushContext(entity);
+                context.pushContext(entity); // pushContext internally adds it
                 scopedEntities.add(entity);
+            } else {
+                context.addEntity(entity); // Only add non-scoped entities explicitly
             }
         }
 
