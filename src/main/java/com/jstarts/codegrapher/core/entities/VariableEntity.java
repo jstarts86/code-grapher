@@ -1,8 +1,10 @@
 package com.jstarts.codegrapher.core.entities;
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class VariableEntity extends CodeEntity {
     private final String declaredType;
     private final boolean isTyped;

@@ -62,15 +62,16 @@ public class VariableEntityExtractorTest {
         // 5. Print extracted entities for manual inspection
         System.out.println("\n=== Extracted Entities ===");
         context.getAllEntities().forEach(e -> {
-            System.out.printf(
-                    "%s | name=%s | type=%s | parent=%s | line=%d%n",
-                    e.getType(),
-                    e.getName(),
-                    (e instanceof VariableEntity var)
-                            ? var.getDeclaredType()
-                            : null,
-                    e.getParentId(),
-                    e.getLocation().startLine());
+            // System.out.printf(
+            // "%s | name=%s | type=%s | parent=%s | line=%d%n",
+            // e.getType(),
+            // e.getName(),
+            // (e instanceof VariableEntity var)
+            // ? var.getDeclaredType()
+            // : null,
+            // e.getParentId(),
+            // e.getLocation().startLine());
+            System.out.println(e);
         });
 
         // 6. Optionally add assertions (smoke test)

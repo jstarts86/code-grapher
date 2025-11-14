@@ -15,5 +15,6 @@ public enum CodeEntityType {
     LAMBDA,
     ATTRIBUTE,
     ASSIGNMENT,
-    ARGUMENT
+    ARGUMENT,
+    TYPE
 }
