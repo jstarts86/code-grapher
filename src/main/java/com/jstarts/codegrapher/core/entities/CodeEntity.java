@@ -1,16 +1,11 @@
 package com.jstarts.codegrapher.core.entities;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public abstract class CodeEntity {
