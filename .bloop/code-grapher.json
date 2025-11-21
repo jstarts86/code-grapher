@@ -1,0 +1,577 @@
+{
+    "version": "1.4.0",
+    "project": {
+        "name": "code-grapher",
+        "directory": "/Users/john/Coding/IdeaProjects/code-grapher",
+        "workspaceDir": "/Users/john/Coding/IdeaProjects/code-grapher",
+        "sources": [
+            "/Users/john/Coding/IdeaProjects/code-grapher/src/main/java"
+        ],
+        "dependencies": [
+            
+        ],
+        "classpath": [
+            "/Users/john/Coding/IdeaProjects/code-grapher/target/classes",
+            "/Users/john/.m2/repository/ch/usi/si/seart/java-tree-sitter/1.13.0-SNAPSHOT/java-tree-sitter-1.13.0-SNAPSHOT.jar",
+            "/Users/john/.m2/repository/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar",
+            "/Users/john/.m2/repository/org/apache/commons/commons-lang3/3.17.0/commons-lang3-3.17.0.jar",
+            "/Users/john/.m2/repository/commons-io/commons-io/2.19.0/commons-io-2.19.0.jar",
+            "/Users/john/.m2/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar",
+            "/Users/john/.m2/repository/com/falkordb/jfalkordb/0.5.0/jfalkordb-0.5.0.jar",
+            "/Users/john/.m2/repository/redis/clients/jedis/6.1.0/jedis-6.1.0.jar",
+            "/Users/john/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
+            "/Users/john/.m2/repository/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1.jar",
+            "/Users/john/.m2/repository/org/json/json/20250517/json-20250517.jar",
+            "/Users/john/.m2/repository/redis/clients/authentication/redis-authx-core/0.1.1-beta2/redis-authx-core-0.1.1-beta2.jar",
+            "/Users/john/.m2/repository/org/apache/commons/commons-text/1.14.0/commons-text-1.14.0.jar",
+            "/Users/john/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar",
+            "/Users/john/.m2/repository/com/google/errorprone/error_prone_annotations/2.27.0/error_prone_annotations-2.27.0.jar",
+            "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar",
+            "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar",
+            "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar",
+            "/Users/john/.m2/repository/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0.jar",
+            "/Users/john/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar",
+            "/Users/john/.m2/repository/net/bytebuddy/byte-buddy/1.12.21/byte-buddy-1.12.21.jar",
+            "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-api/2.23.1/log4j-api-2.23.1.jar",
+            "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-core/2.23.1/log4j-core-2.23.1.jar"
+        ],
+        "out": "/Users/john/Coding/IdeaProjects/code-grapher/target",
+        "classesDir": "/Users/john/Coding/IdeaProjects/code-grapher/target/classes",
+        "resources": [
+            "/Users/john/Coding/IdeaProjects/code-grapher/src/main/resources"
+        ],
+        "java": {
+            "options": [
+                "-g",
+                "-target",
+                "22",
+                "-source",
+                "22",
+                "-encoding",
+                "UTF-8"
+            ]
+        },
+        "test": {
+            "frameworks": [
+                {
+                    "names": [
+                        "com.novocode.junit.JUnitFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.scalatest.tools.Framework",
+                        "org.scalatest.tools.ScalaTestFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.scalacheck.ScalaCheckFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "org.specs.runner.SpecsFramework",
+                        "org.specs2.runner.Specs2Framework",
+                        "org.specs2.runner.SpecsFramework"
+                    ]
+                },
+                {
+                    "names": [
+                        "utest.runner.Framework"
+                    ]
+                },
+                {
+                    "names": [
+                        "munit.Framework"
+                    ]
+                }
+            ],
+            "options": {
+                "excludes": [
+                    
+                ],
+                "arguments": [
+                    {
+                        "args": [
+                            "-v",
+                            "-a"
+                        ],
+                        "framework": {
+                            "names": [
+                                "com.novocode.junit.JUnitFramework"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "platform": {
+            "name": "jvm",
+            "config": {
+                "home": "/Users/john/Library/Java/JavaVirtualMachines/corretto-22.0.2/Contents/Home",
+                "options": [
+                    
+                ]
+            },
+            "mainClass": [
+                
+            ]
+        },
+        "resolution": {
+            "modules": [
+                {
+                    "organization": "org.junit.jupiter",
+                    "name": "junit-jupiter-engine",
+                    "version": "5.8.2",
+                    "artifacts": [
+                        {
+                            "name": "junit-jupiter-engine",
+                            "path": "/Users/john/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar"
+                        },
+                        {
+                            "name": "junit-jupiter-engine",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.slf4j",
+                    "name": "slf4j-api",
+                    "version": "1.7.36",
+                    "artifacts": [
+                        {
+                            "name": "slf4j-api",
+                            "path": "/Users/john/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar"
+                        },
+                        {
+                            "name": "slf4j-api",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.projectlombok",
+                    "name": "lombok",
+                    "version": "1.18.38",
+                    "artifacts": [
+                        {
+                            "name": "lombok",
+                            "path": "/Users/john/.m2/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar"
+                        },
+                        {
+                            "name": "lombok",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.logging.log4j",
+                    "name": "log4j-api",
+                    "version": "2.23.1",
+                    "artifacts": [
+                        {
+                            "name": "log4j-api",
+                            "path": "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-api/2.23.1/log4j-api-2.23.1.jar"
+                        },
+                        {
+                            "name": "log4j-api",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-api/2.23.1/log4j-api-2.23.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apiguardian",
+                    "name": "apiguardian-api",
+                    "version": "1.1.2",
+                    "artifacts": [
+                        {
+                            "name": "apiguardian-api",
+                            "path": "/Users/john/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar"
+                        },
+                        {
+                            "name": "apiguardian-api",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "ch.usi.si.seart",
+                    "name": "java-tree-sitter",
+                    "version": "1.13.0-SNAPSHOT",
+                    "artifacts": [
+                        {
+                            "name": "java-tree-sitter",
+                            "path": "/Users/john/.m2/repository/ch/usi/si/seart/java-tree-sitter/1.13.0-SNAPSHOT/java-tree-sitter-1.13.0-SNAPSHOT.jar"
+                        },
+                        {
+                            "name": "java-tree-sitter",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/ch/usi/si/seart/java-tree-sitter/1.13.0-SNAPSHOT/java-tree-sitter-1.13.0-SNAPSHOT-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.json",
+                    "name": "json",
+                    "version": "20250517",
+                    "artifacts": [
+                        {
+                            "name": "json",
+                            "path": "/Users/john/.m2/repository/org/json/json/20250517/json-20250517.jar"
+                        },
+                        {
+                            "name": "json",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/json/json/20250517/json-20250517-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.errorprone",
+                    "name": "error_prone_annotations",
+                    "version": "2.27.0",
+                    "artifacts": [
+                        {
+                            "name": "error_prone_annotations",
+                            "path": "/Users/john/.m2/repository/com/google/errorprone/error_prone_annotations/2.27.0/error_prone_annotations-2.27.0.jar"
+                        },
+                        {
+                            "name": "error_prone_annotations",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/google/errorprone/error_prone_annotations/2.27.0/error_prone_annotations-2.27.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.bytebuddy",
+                    "name": "byte-buddy",
+                    "version": "1.12.21",
+                    "artifacts": [
+                        {
+                            "name": "byte-buddy",
+                            "path": "/Users/john/.m2/repository/net/bytebuddy/byte-buddy/1.12.21/byte-buddy-1.12.21.jar"
+                        },
+                        {
+                            "name": "byte-buddy",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/net/bytebuddy/byte-buddy/1.12.21/byte-buddy-1.12.21-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.commons",
+                    "name": "commons-pool2",
+                    "version": "2.12.1",
+                    "artifacts": [
+                        {
+                            "name": "commons-pool2",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1.jar"
+                        },
+                        {
+                            "name": "commons-pool2",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.commons",
+                    "name": "commons-text",
+                    "version": "1.14.0",
+                    "artifacts": [
+                        {
+                            "name": "commons-text",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-text/1.14.0/commons-text-1.14.0.jar"
+                        },
+                        {
+                            "name": "commons-text",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-text/1.14.0/commons-text-1.14.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.junit.platform",
+                    "name": "junit-platform-engine",
+                    "version": "1.8.2",
+                    "artifacts": [
+                        {
+                            "name": "junit-platform-engine",
+                            "path": "/Users/john/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar"
+                        },
+                        {
+                            "name": "junit-platform-engine",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "redis.clients",
+                    "name": "jedis",
+                    "version": "6.1.0",
+                    "artifacts": [
+                        {
+                            "name": "jedis",
+                            "path": "/Users/john/.m2/repository/redis/clients/jedis/6.1.0/jedis-6.1.0.jar"
+                        },
+                        {
+                            "name": "jedis",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/redis/clients/jedis/6.1.0/jedis-6.1.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.fasterxml.jackson.core",
+                    "name": "jackson-annotations",
+                    "version": "2.18.1",
+                    "artifacts": [
+                        {
+                            "name": "jackson-annotations",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1.jar"
+                        },
+                        {
+                            "name": "jackson-annotations",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.1/jackson-annotations-2.18.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "redis.clients.authentication",
+                    "name": "redis-authx-core",
+                    "version": "0.1.1-beta2",
+                    "artifacts": [
+                        {
+                            "name": "redis-authx-core",
+                            "path": "/Users/john/.m2/repository/redis/clients/authentication/redis-authx-core/0.1.1-beta2/redis-authx-core-0.1.1-beta2.jar"
+                        },
+                        {
+                            "name": "redis-authx-core",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/redis/clients/authentication/redis-authx-core/0.1.1-beta2/redis-authx-core-0.1.1-beta2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.commons",
+                    "name": "commons-collections4",
+                    "version": "4.5.0",
+                    "artifacts": [
+                        {
+                            "name": "commons-collections4",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar"
+                        },
+                        {
+                            "name": "commons-collections4",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.logging.log4j",
+                    "name": "log4j-core",
+                    "version": "2.23.1",
+                    "artifacts": [
+                        {
+                            "name": "log4j-core",
+                            "path": "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-core/2.23.1/log4j-core-2.23.1.jar"
+                        },
+                        {
+                            "name": "log4j-core",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/logging/log4j/log4j-core/2.23.1/log4j-core-2.23.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.opentest4j",
+                    "name": "opentest4j",
+                    "version": "1.2.0",
+                    "artifacts": [
+                        {
+                            "name": "opentest4j",
+                            "path": "/Users/john/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar"
+                        },
+                        {
+                            "name": "opentest4j",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.fasterxml.jackson.core",
+                    "name": "jackson-core",
+                    "version": "2.18.1",
+                    "artifacts": [
+                        {
+                            "name": "jackson-core",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1.jar"
+                        },
+                        {
+                            "name": "jackson-core",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.1/jackson-core-2.18.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.apache.commons",
+                    "name": "commons-lang3",
+                    "version": "3.17.0",
+                    "artifacts": [
+                        {
+                            "name": "commons-lang3",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-lang3/3.17.0/commons-lang3-3.17.0.jar"
+                        },
+                        {
+                            "name": "commons-lang3",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/apache/commons/commons-lang3/3.17.0/commons-lang3-3.17.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.junit.jupiter",
+                    "name": "junit-jupiter-api",
+                    "version": "5.8.2",
+                    "artifacts": [
+                        {
+                            "name": "junit-jupiter-api",
+                            "path": "/Users/john/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar"
+                        },
+                        {
+                            "name": "junit-jupiter-api",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.junit.platform",
+                    "name": "junit-platform-commons",
+                    "version": "1.8.2",
+                    "artifacts": [
+                        {
+                            "name": "junit-platform-commons",
+                            "path": "/Users/john/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar"
+                        },
+                        {
+                            "name": "junit-platform-commons",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "commons-codec",
+                    "name": "commons-codec",
+                    "version": "1.16.0",
+                    "artifacts": [
+                        {
+                            "name": "commons-codec",
+                            "path": "/Users/john/.m2/repository/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0.jar"
+                        },
+                        {
+                            "name": "commons-codec",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/commons-codec/commons-codec/1.16.0/commons-codec-1.16.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.fasterxml.jackson.core",
+                    "name": "jackson-databind",
+                    "version": "2.18.1",
+                    "artifacts": [
+                        {
+                            "name": "jackson-databind",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1.jar"
+                        },
+                        {
+                            "name": "jackson-databind",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.1/jackson-databind-2.18.1-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.falkordb",
+                    "name": "jfalkordb",
+                    "version": "0.5.0",
+                    "artifacts": [
+                        {
+                            "name": "jfalkordb",
+                            "path": "/Users/john/.m2/repository/com/falkordb/jfalkordb/0.5.0/jfalkordb-0.5.0.jar"
+                        },
+                        {
+                            "name": "jfalkordb",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/falkordb/jfalkordb/0.5.0/jfalkordb-0.5.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "org.assertj",
+                    "name": "assertj-core",
+                    "version": "3.24.2",
+                    "artifacts": [
+                        {
+                            "name": "assertj-core",
+                            "path": "/Users/john/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar"
+                        },
+                        {
+                            "name": "assertj-core",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "com.google.code.gson",
+                    "name": "gson",
+                    "version": "2.11.0",
+                    "artifacts": [
+                        {
+                            "name": "gson",
+                            "path": "/Users/john/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar"
+                        },
+                        {
+                            "name": "gson",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "commons-io",
+                    "name": "commons-io",
+                    "version": "2.19.0",
+                    "artifacts": [
+                        {
+                            "name": "commons-io",
+                            "path": "/Users/john/.m2/repository/commons-io/commons-io/2.19.0/commons-io-2.19.0.jar"
+                        },
+                        {
+                            "name": "commons-io",
+                            "classifier": "sources",
+                            "path": "/Users/john/.m2/repository/commons-io/commons-io/2.19.0/commons-io-2.19.0-sources.jar"
+                        }
+                    ]
+                }
+            ]
+        },
+        "tags": [
+            "library"
+        ]
+    }
+}

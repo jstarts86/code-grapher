@@ -16,5 +16,6 @@ public enum CodeEntityType {
     ATTRIBUTE,
     ASSIGNMENT,
     ARGUMENT,
-    TYPE
+    TYPE,
+    CALL
 }
