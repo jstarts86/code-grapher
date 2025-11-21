@@ -14,6 +14,11 @@ public class ExtractionContext {
 
     private final Deque<CodeEntity> contextStack = new ArrayDeque<>();
     private final List<CodeEntity> allExtractedEntities = new ArrayList<>();
+    private final TypeEntityCache typeEntityCache;
+
+    public ExtractionContext() {
+        this.typeEntityCache = new TypeEntityCache(this);
+    }
 
     /**
      * Push a new entity onto the active scope stack
@@ -64,5 +69,9 @@ public class ExtractionContext {
 
     public boolean isEmpty() {
         return contextStack.isEmpty();
+    }
+
+    public TypeEntityCache getTypeEntityCache() {
+        return typeEntityCache;
     }
 }

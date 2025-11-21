@@ -67,20 +67,10 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                 // Construct a canonical TypeEntity for this annotation
                 PythonType pyType = PythonType.of(declaredType);
 
-                // You can reuse the same SourceLocation or make a synthetic one
-                TypeEntity typeEntity = new TypeEntity.Builder()
-                        .id(CodeEntity.generateId(
-                                // deterministic pseudo‑location or hash
-                                new SourceLocation(filePath, 0, 0, 0, 0, 0, 0)))
-                        .name(pyType.name())
-                        .typeName(pyType.name())
-                        .module(pyType.module())
-                        .isBuiltin(pyType.isBuiltin())
-                        .isCollection(pyType.isCollection())
-                        .build();
+                // Use the cache to get or create the TypeEntity
+                TypeEntity typeEntity = context.getTypeEntityCache().getOrCreate(pyType);
 
-                // Add it to context for later persistence and linking
-                context.addEntity(typeEntity);
+                // (You will later add the HAS_TYPE edge during Pass 2)
 
                 // (You will later add the HAS_TYPE edge during Pass 2)
             }
