@@ -68,7 +68,6 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                 PythonType pyType = PythonType.of(declaredType);
 
                 // Use the cache to get or create the TypeEntity
-                TypeEntity typeEntity = context.getTypeEntityCache().getOrCreate(pyType);
 
                 // (You will later add the HAS_TYPE edge during Pass 2)
 
