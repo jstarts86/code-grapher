@@ -21,22 +21,38 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
 
     @Override
     public List<CodeEntity> extract(Node node, ExtractionContext context, String filePath, String sourceCode) {
+        com.jstarts.codegrapher.parsers.PythonTypeParser pythonTypeParser = new com.jstarts.codegrapher.parsers.PythonTypeParser(
+                context.getTypeCanon());
         return Optional.ofNullable(node.getChildByFieldName("name"))
-                .flatMap(nameNode -> buildFunctionEntity(nameNode, node, context, filePath, sourceCode))
+                .flatMap(nameNode -> buildFunctionEntity(nameNode, node, context, filePath, sourceCode,
+                        pythonTypeParser))
                 .<List<CodeEntity>>map(List::of)
                 .orElse(List.of());
     }
 
     private Optional<CodeEntity> buildFunctionEntity(Node nameNode, Node functionNode, ExtractionContext context,
-            String filePath, String sourceCode) {
+            String filePath, String sourceCode, com.jstarts.codegrapher.parsers.PythonTypeParser parser) {
         try {
             String name = sourceCode.substring(nameNode.getStartByte(), nameNode.getEndByte());
             SourceLocation location = buildLocation(filePath, functionNode);
             List<String> typeParameters = extractTypeParameters(functionNode, sourceCode);
-            List<Parameter> parameters = extractParameters(functionNode, sourceCode);
+            List<Parameter> parameters = extractParameters(functionNode, sourceCode, parser);
             boolean isAsync = isAsync(functionNode);
             CodeEntity parent = context.peekContext();
             String parentId = parent != null ? parent.getId() : null;
+
+            String returnType = null;
+            String returnTypeId = null;
+            Node returnTypeNode = functionNode.getChildByFieldName("return_type");
+            if (returnTypeNode != null) {
+                com.jstarts.codegrapher.core.entities.PythonTypeEntity typeEntity = parser.parse(returnTypeNode,
+                        sourceCode);
+                if (typeEntity != null) {
+                    returnType = typeEntity.getSignature(); // or name?
+                    returnTypeId = typeEntity.getId();
+                }
+            }
+
             FunctionEntity functionEntity = new FunctionEntity.Builder()
                     .name(name)
                     .location(location)
@@ -44,6 +60,8 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                     .parameters(parameters)
                     .isAsync(isAsync)
                     .parentId(parentId)
+                    .returnType(returnType)
+                    .returnTypeId(returnTypeId)
                     .build();
             return Optional.of(functionEntity);
 
@@ -63,34 +81,50 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                 .orElse(List.of());
     }
 
-    private List<Parameter> extractParameters(Node functionNode, String sourceCode) {
+    private List<Parameter> extractParameters(Node functionNode, String sourceCode,
+            com.jstarts.codegrapher.parsers.PythonTypeParser parser) {
         return Optional.ofNullable(functionNode.getChildByFieldName("parameters"))
                 .map(Node::getChildren)
                 .map(children -> children.stream()
-                        .map(child -> extractSingleParameter(child, sourceCode)).toList())
+                        .filter(child -> !child.getType().equals("(") && !child.getType().equals(")")
+                                && !child.getType().equals(","))
+                        .map(child -> extractSingleParameter(child, sourceCode, parser)).toList())
                 .orElse(List.of());
     }
 
-    private Parameter extractSingleParameter(Node paramNode, String sourceCode) {
+    private Parameter extractSingleParameter(Node paramNode, String sourceCode,
+            com.jstarts.codegrapher.parsers.PythonTypeParser parser) {
         return switch (paramNode.getType()) {
             case "identifier" -> new Parameter(
                     ParameterKind.NORMAL,
                     extractText(paramNode, sourceCode),
                     Optional.empty(),
+                    Optional.empty(),
                     Optional.empty());
 
             case "typed_parameter" -> {
-                String[] parts = paramNode.getChildren().stream()
-                        .collect(Collector.of(
-                                () -> new String[2],
-                                (acc, child) -> {
-                                    switch (child.getType()) {
-                                        case "identifier" -> acc[0] = extractText(child, sourceCode);
-                                        case "type" -> acc[1] = extractText(child, sourceCode);
-                                    }
-                                },
-                                (a, b) -> a));
-                yield new Parameter(ParameterKind.TYPED, parts[0], Optional.ofNullable(parts[1]), Optional.empty());
+                String name = null;
+                String typeName = null;
+                String typeId = null;
+
+                for (int i = 0; i < paramNode.getChildCount(); i++) {
+                    Node child = paramNode.getChild(i);
+                    if ("identifier".equals(child.getType()) || "list_splat_pattern".equals(child.getType())
+                            || "dictionary_splat_pattern".equals(child.getType())) {
+                        name = extractText(child, sourceCode);
+                    } else if ("type".equals(child.getType())) {
+                        com.jstarts.codegrapher.core.entities.PythonTypeEntity typeEntity = parser.parse(child,
+                                sourceCode);
+                        if (typeEntity != null) {
+                            typeName = typeEntity.getSignature();
+                            typeId = typeEntity.getId();
+                        } else {
+                            typeName = extractText(child, sourceCode);
+                        }
+                    }
+                }
+                yield new Parameter(ParameterKind.TYPED, name, Optional.ofNullable(typeName), Optional.empty(),
+                        Optional.ofNullable(typeId));
             }
             // name: (identifier) ; [0, 19] - [0, 20]
             // value: (integer)) ; [0, 21] - [0, 23]
@@ -99,13 +133,32 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                         ParameterKind.DEFAULT,
                         extractField(paramNode, "name", sourceCode).orElse(null),
                         Optional.empty(),
-                        extractField(paramNode, "value", sourceCode));
+                        extractField(paramNode, "value", sourceCode),
+                        Optional.empty());
             }
             case "typed_default_parameter" -> {
+                String name = extractField(paramNode, "name", sourceCode).orElse(null);
+                String value = extractField(paramNode, "value", sourceCode).orElse(null);
+                String typeName = null;
+                String typeId = null;
+
+                Node typeNode = paramNode.getChildByFieldName("type");
+                if (typeNode != null) {
+                    com.jstarts.codegrapher.core.entities.PythonTypeEntity typeEntity = parser.parse(typeNode,
+                            sourceCode);
+                    if (typeEntity != null) {
+                        typeName = typeEntity.getSignature();
+                        typeId = typeEntity.getId();
+                    } else {
+                        typeName = extractText(typeNode, sourceCode);
+                    }
+                }
+
                 yield new Parameter(ParameterKind.TYPED_DEFAULT,
-                        extractField(paramNode, "name", sourceCode).orElse(null),
-                        extractField(paramNode, "type", sourceCode),
-                        extractField(paramNode, "value", sourceCode));
+                        name,
+                        Optional.ofNullable(typeName),
+                        Optional.ofNullable(value),
+                        Optional.ofNullable(typeId));
 
             }
             case "list_splat_pattern" -> {
@@ -114,6 +167,7 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                         .findFirst();
                 yield new Parameter(ParameterKind.LIST_SPLAT,
                         target.map(child -> extractText(child, sourceCode)).orElse(null),
+                        Optional.empty(),
                         Optional.empty(),
                         Optional.empty());
             }
@@ -125,12 +179,14 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
                 yield new Parameter(ParameterKind.DICT_SPLAT,
                         target.map(child -> extractText(child, sourceCode)).orElse(null),
                         Optional.empty(),
+                        Optional.empty(),
                         Optional.empty());
             }
             default -> new Parameter(ParameterKind.DEFAULT,
                     "null",
                     Optional.of("null"),
-                    Optional.of("null"));
+                    Optional.of("null"),
+                    Optional.empty());
         };
 
     }

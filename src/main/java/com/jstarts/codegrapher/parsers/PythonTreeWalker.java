@@ -28,41 +28,33 @@ public class PythonTreeWalker {
             return;
         }
 
-        // Get all extractors registered for this node type
         List<CodeEntity> extracted = new ArrayList<>();
         for (var extractor : registry.getExtractors(node.getType())) {
             extracted.addAll(extractor.extract(node, context, sourceFilePath, sourceCode));
         }
 
-        // Track which entities are scoped (need push/pop)
+        
         List<CodeEntity> scopedEntities = new ArrayList<>();
 
-        // Process each extracted entity
         for (CodeEntity entity : extracted) {
             if (isScoped(entity)) {
                 context.pushContext(entity); // pushContext internally adds it
                 scopedEntities.add(entity);
             } else {
-                context.addEntity(entity); // Only add non-scoped entities explicitly
+                context.addEntity(entity); // only add non-scoped entities explicitly
             }
         }
 
-        // Traverse children
         for (int i = 0; i < node.getChildCount(); i++) {
             walk(node.getChild(i));
         }
 
-        // Pop scoped entities in reverse order (LIFO)
         for (int i = scopedEntities.size() - 1; i >= 0; i--) {
             context.popContext();
         }
     }
 
-    /**
-     * Determines if an entity creates a new scope.
-     * Only File, Class, and Function entities are scoped.
-     */
-    private boolean isScoped(CodeEntity entity) {
+        private boolean isScoped(CodeEntity entity) {
         return entity instanceof FileEntity
                 || entity instanceof ClassEntity
                 || entity instanceof FunctionEntity;
