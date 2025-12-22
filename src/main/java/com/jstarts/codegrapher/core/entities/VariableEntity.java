@@ -10,6 +10,7 @@ public class VariableEntity extends CodeEntity {
     private final boolean isTyped;
     private final boolean isAssigned;
     private final boolean isParameterLike;
+    private final String typeId;
 
     protected VariableEntity(Builder builder) {
         super(builder);
@@ -17,6 +18,7 @@ public class VariableEntity extends CodeEntity {
         this.isTyped = builder.isTyped;
         this.isAssigned = builder.isAssigned;
         this.isParameterLike = builder.isParameterLike;
+        this.typeId = builder.typeId;
     }
 
     public static class Builder extends CodeEntity.Builder<Builder> {
@@ -24,9 +26,15 @@ public class VariableEntity extends CodeEntity {
         private boolean isTyped;
         private boolean isAssigned;
         private boolean isParameterLike;
+        private String typeId;
 
         public Builder declaredType(String declaredType) {
             this.declaredType = declaredType;
+            return this;
+        }
+
+        public Builder typeId(String typeId) {
+            this.typeId = typeId;
             return this;
         }
 

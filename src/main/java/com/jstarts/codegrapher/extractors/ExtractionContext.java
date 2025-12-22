@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.List;
 
 import com.jstarts.codegrapher.core.entities.CodeEntity;
+import com.jstarts.codegrapher.core.entities.PythonTypeCanon;
 
 import lombok.Getter;
 
@@ -14,7 +15,7 @@ public class ExtractionContext {
 
     private final Deque<CodeEntity> contextStack = new ArrayDeque<>();
     private final List<CodeEntity> allExtractedEntities = new ArrayList<>();
-
+    private final PythonTypeCanon typeCanon = new PythonTypeCanon();
 
     /**
      * Push a new entity onto the active scope stack

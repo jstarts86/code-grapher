@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @ToString
+@Getter
 public class FunctionEntity extends CodeEntity {
 
     private final boolean isAsync;
@@ -15,12 +16,15 @@ public class FunctionEntity extends CodeEntity {
     private final List<Parameter> parameters;
     private final String returnType;
 
+    private final String returnTypeId;
+
     protected FunctionEntity(Builder builder) {
         super(builder);
         this.isAsync = builder.isAsync;
         this.returnType = builder.returnType;
         this.parameters = builder.parameters;
         this.typeParameters = builder.typeParameters;
+        this.returnTypeId = builder.returnTypeId;
     }
 
     @Getter
@@ -31,6 +35,7 @@ public class FunctionEntity extends CodeEntity {
         private final String name;
         private final Optional<String> typeAnnotation;
         private final Optional<String> defaultValue;
+        private final Optional<String> typeId;
     }
 
     public enum ParameterKind {
@@ -50,6 +55,8 @@ public class FunctionEntity extends CodeEntity {
         private List<Parameter> parameters;
         private List<String> typeParameters;
 
+        private String returnTypeId;
+
         public Builder isAsync(boolean isAsync) {
             this.isAsync = isAsync;
             return this;
@@ -57,6 +64,11 @@ public class FunctionEntity extends CodeEntity {
 
         public Builder returnType(String returnType) {
             this.returnType = returnType;
+            return this;
+        }
+
+        public Builder returnTypeId(String returnTypeId) {
+            this.returnTypeId = returnTypeId;
             return this;
         }
 

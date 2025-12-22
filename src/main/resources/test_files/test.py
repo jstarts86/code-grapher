@@ -1,22 +1,5 @@
 """A small but expressive test file for the Code Grapher tool."""
 
-# (import_statement ; [2, 0] - [2, 18]
-#   name: (aliased_import ; [2, 7] - [2, 18]
-#     name: (dotted_name ; [2, 7] - [2, 12]
-#       (identifier)) ; [2, 7] - [2, 12]
-#     alias: (identifier))) ; [2, 16] - [2, 18]
-# (import_from_statement ; [3, 0] - [3, 34]
-#   module_name: (dotted_name ; [3, 5] - [3, 12]
-#     (identifier)) ; [3, 5] - [3, 12]
-#   name: (dotted_name ; [3, 20] - [3, 24]
-#     (identifier)) ; [3, 20] - [3, 24]
-#   name: (dotted_name ; [3, 26] - [3, 34]
-#     (identifier))) ; [3, 26] - [3, 34]
-# (import_from_statement ; [4, 0] - [4, 20]
-#   module_name: (relative_import ; [4, 5] - [4, 7]
-#     (import_prefix)) ; [4, 5] - [4, 7]
-#   name: (dotted_name ; [4, 15] - [4, 20]
-#     (identifier))) ; [4, 15] - [4, 20]
 import numpy as np
 from pathlib import Path, PurePath
 from .. import utils
