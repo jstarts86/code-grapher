@@ -45,7 +45,8 @@ public class PythonTypeParser {
             case "union_type":
                 return parseUnionType(typeNode, sourceCode);
             case "binary_operator":
-                // handle A | B if parsed as binary_operator (though union_type is preferred in grammar)
+                // handle A | B if parsed as binary_operator (though union_type is preferred in
+                // grammar)
                 if ("|".equals(typeNode.getChildByFieldName("operator").getType())) {
                     return parseUnionType(typeNode, sourceCode);
                 }
@@ -209,6 +210,7 @@ public class PythonTypeParser {
 
     private PythonTypeEntity createTypeEntity(String name, String signature, List<PythonTypeEntity> generics) {
         return typeCanon.getCanonicalType(signature, () -> new PythonTypeEntity.Builder()
+                .id(org.apache.commons.codec.digest.DigestUtils.sha256Hex(signature).substring(0, 16))
                 .name(name)
                 .signature(signature)
                 .generics(generics)

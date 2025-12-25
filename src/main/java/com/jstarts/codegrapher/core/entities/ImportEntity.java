@@ -10,21 +10,26 @@ import lombok.ToString;
  * Represents a single import statement in a Python file.
  *
  * Examples:
- *   import os
- *   import numpy as np
- *   from pathlib import Path, PurePath
- *   from .. import utils
+ * import os
+ * import numpy as np
+ * from pathlib import Path, PurePath
+ * from .. import utils
  */
 @Getter
 @ToString
 public class ImportEntity extends CodeEntity {
 
-    private final String fromModule;              // e.g. "pathlib" or null for plain import
-    private final boolean isFromImport;           // true if "from X import Y"
-    private final boolean isRelative;             // true if relative import ("from ..foo import bar")
-    private final int relativeLevel;              // number of leading dots for relative imports
-    private final List<String> importedNames;     // e.g. ["Path", "PurePath"] or ["os"]
-    private final Map<String, String> aliases;    // alias -> full name, e.g. { "np" : "numpy" }
+    private final String fromModule; // e.g. "pathlib" or null for plain import
+    private final boolean isFromImport; // true if "from X import Y"
+    private final boolean isRelative; // true if relative import ("from ..foo import bar")
+    private final int relativeLevel; // number of leading dots for relative imports
+    private final List<String> importedNames; // e.g. ["Path", "PurePath"] or ["os"]
+    private final Map<String, String> aliases; // alias -> full name, e.g. { "np" : "numpy" }
+    private Map<String, String> resolvedReferences; // importedName -> targetEntityId
+
+    public void setResolvedReferences(Map<String, String> resolvedReferences) {
+        this.resolvedReferences = resolvedReferences;
+    }
 
     protected ImportEntity(Builder builder) {
         super(builder);
@@ -34,6 +39,7 @@ public class ImportEntity extends CodeEntity {
         this.relativeLevel = builder.relativeLevel;
         this.importedNames = builder.importedNames;
         this.aliases = builder.aliases;
+        this.resolvedReferences = builder.resolvedReferences;
     }
 
     /**
@@ -46,6 +52,7 @@ public class ImportEntity extends CodeEntity {
         private int relativeLevel;
         private List<String> importedNames;
         private Map<String, String> aliases;
+        private Map<String, String> resolvedReferences;
 
         public Builder fromModule(String fromModule) {
             this.fromModule = fromModule;
@@ -77,6 +84,11 @@ public class ImportEntity extends CodeEntity {
             return this;
         }
 
+        public Builder resolvedReferences(Map<String, String> resolvedReferences) {
+            this.resolvedReferences = resolvedReferences;
+            return this;
+        }
+
         @Override
         protected Builder self() {
             return this;
@@ -91,14 +103,14 @@ public class ImportEntity extends CodeEntity {
 
     // @Override
     // public String toString() {
-    //     String base = isFromImport
-    //             ? String.format("from %s import %s", 
-    //                 fromModule != null ? fromModule : "", 
-    //                 importedNames != null ? importedNames : "")
-    //             : String.format("import %s", importedNames);
-    //     if (aliases != null && !aliases.isEmpty()) {
-    //         base += " as " + aliases;
-    //     }
-    //     return base;
+    // String base = isFromImport
+    // ? String.format("from %s import %s",
+    // fromModule != null ? fromModule : "",
+    // importedNames != null ? importedNames : "")
+    // : String.format("import %s", importedNames);
+    // if (aliases != null && !aliases.isEmpty()) {
+    // base += " as " + aliases;
+    // }
+    // return base;
     // }
 }

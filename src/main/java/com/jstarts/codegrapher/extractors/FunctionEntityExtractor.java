@@ -54,6 +54,7 @@ public class FunctionEntityExtractor implements CodeEntityExtractor {
             }
 
             FunctionEntity functionEntity = new FunctionEntity.Builder()
+                    .id(CodeEntity.generateId(location))
                     .name(name)
                     .location(location)
                     .typeParameters(typeParameters)
