@@ -29,7 +29,7 @@ public class FalkorDBClient implements AutoCloseable {
         return executeQuery(query, Collections.emptyMap());
     }
 
-    public ResultSet executeQuery(String query, Map<String,Object> params) {
+    public ResultSet executeQuery(String query, Map<String, Object> params) {
         return graph.query(query, params);
     }
 
@@ -45,6 +45,7 @@ public class FalkorDBClient implements AutoCloseable {
             throw new RuntimeException("Error closing FalkorDB driver: ", e);
         }
     }
+
     public static <R> R use(String host, int port, String graphId, Function<FalkorDBClient, R> operation) {
         try (FalkorDBClient client = FalkorDBClient.connect(host, port, graphId)) {
             return operation.apply(client);
@@ -53,8 +54,4 @@ public class FalkorDBClient implements AutoCloseable {
         }
     }
 
-
-
-
-    
 }

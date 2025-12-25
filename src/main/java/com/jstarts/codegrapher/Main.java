@@ -26,15 +26,63 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        // 1. Setup Repository Path
-        // Use the sample project for demonstration
-        Path repoPath = Path.of("src/test/resources/test_repos/sample_project").toAbsolutePath();
+        if (args.length == 0) {
+            printUsage();
+            return;
+        }
+
+        String repoPathStr = null;
+        String dbHost = "localhost";
+        int dbPort = 6379;
+        String graphKey = "CodeGraph";
+
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--repo":
+                    if (i + 1 < args.length)
+                        repoPathStr = args[++i];
+                    break;
+                case "--host":
+                    if (i + 1 < args.length)
+                        dbHost = args[++i];
+                    break;
+                case "--port":
+                    if (i + 1 < args.length)
+                        dbPort = Integer.parseInt(args[++i]);
+                    break;
+                case "--graph":
+                    if (i + 1 < args.length)
+                        graphKey = args[++i];
+                    break;
+                case "--help":
+                    printUsage();
+                    return;
+                default:
+                    // Assume first arg is repo if not flagged, or error
+                    if (repoPathStr == null && !args[i].startsWith("-")) {
+                        repoPathStr = args[i];
+                    } else {
+                        System.err.println("Unknown argument: " + args[i]);
+                        printUsage();
+                        return;
+                    }
+            }
+        }
+
+        if (repoPathStr == null) {
+            System.err.println("Error: Repository path is required.");
+            printUsage();
+            return;
+        }
+
+        Path repoPath = Path.of(repoPathStr).toAbsolutePath();
         if (!Files.exists(repoPath)) {
-            System.err.println("Sample project not found at " + repoPath);
+            System.err.println("Error: Repository not found at " + repoPath);
             return;
         }
 
         System.out.println("Processing repository: " + repoPath);
+        System.out.println("Database: " + dbHost + ":" + dbPort + " (" + graphKey + ")");
 
         // 2. Configure Extractors
         ExtractorRegistry registry = new ExtractorRegistry();
@@ -71,21 +119,34 @@ public class Main {
         System.out.println("Calls resolved.");
 
         // 7. Persist to Database
+        String finalDbHost = dbHost;
+        int finalDbPort = dbPort;
+        String finalGraphKey = graphKey;
         try {
-            com.jstarts.codegrapher.db.FalkorDBClient.use("localhost", 6379, "CodeGraph", client -> {
+            com.jstarts.codegrapher.db.FalkorDBClient.use(dbHost, dbPort, graphKey, client -> {
                 com.jstarts.codegrapher.db.GraphPersister persister = new com.jstarts.codegrapher.db.GraphPersister(
                         client);
                 persister.persist(entities);
-                System.out.println("Graph persisted to FalkorDB 'CodeGraph'.");
+                System.out.println("Graph persisted to FalkorDB '" + finalGraphKey + "'.");
                 return null;
             });
         } catch (Exception e) {
             System.err.println(
-                    "Failed to persist to database. Is FalkorDB running? (docker run -p 6379:6379 -it --rm falkordb/falkordb:edge)");
+                    "Failed to persist to database. Is FalkorDB running at " + finalDbHost + ":" + finalDbPort + "?");
             e.printStackTrace();
         }
 
-        printExtractedEntities(context);
+        // printExtractedEntities(context);
+    }
+
+    private static void printUsage() {
+        System.out.println("Usage: java -jar code-grapher.jar --repo <path> [options]");
+        System.out.println("Options:");
+        System.out.println("  --repo <path>   Path to the repository to process");
+        System.out.println("  --host <host>   FalkorDB host (default: localhost)");
+        System.out.println("  --port <port>   FalkorDB port (default: 6379)");
+        System.out.println("  --graph <key>   Graph key name (default: CodeGraph)");
+        System.out.println("  --help          Show this help message");
     }
 
     private static void printExtractedEntities(ExtractionContext context) {
