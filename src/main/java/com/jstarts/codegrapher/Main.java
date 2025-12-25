@@ -25,31 +25,64 @@ public class Main {
         LibraryLoader.load();
     }
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        // Path path = Paths.get(new String(
-        // Objects.requireNonNull(
-        // ClassLoader.getSystemResourceAsStream("test/test.py").readAllBytes())));
-        // String pythonSource = Files.readString(path);
-        // Parser parser = Parser.getFor(Language.PYTHON);
-        // Tree tree = parser.parse(pythonSource);
+    public static void main(String[] args) throws Exception {
+        // 1. Setup Repository Path
+        // Use the sample project for demonstration
+        Path repoPath = Path.of("src/test/resources/test_repos/sample_project").toAbsolutePath();
+        if (!Files.exists(repoPath)) {
+            System.err.println("Sample project not found at " + repoPath);
+            return;
+        }
 
-        var resource = Main.class.getResource("/test_files/class.py");
-        String pythonSource = Files.readString(Path.of(resource.toURI()));
-        Parser parser = Parser.getFor(Language.PYTHON);
-        Tree tree = parser.parse(pythonSource);
+        System.out.println("Processing repository: " + repoPath);
 
+        // 2. Configure Extractors
         ExtractorRegistry registry = new ExtractorRegistry();
         registry.register("module", new FileEntityExtractor());
         registry.register("class_definition", new ClassEntityExtractor());
+        registry.register("function_definition", new com.jstarts.codegrapher.extractors.FunctionEntityExtractor());
+        registry.register("import_statement", new com.jstarts.codegrapher.extractors.ImportEntityExtractor());
+        registry.register("import_from_statement", new com.jstarts.codegrapher.extractors.ImportEntityExtractor());
+        registry.register("call", new com.jstarts.codegrapher.extractors.CallEntityExtractor());
+        // Variable extractor if needed
 
-        ExtractionContext context = new ExtractionContext();
-        PythonTreeWalker walker = new PythonTreeWalker(
-                registry,
-                context,
-                "src/test/resources/test.py",
-                pythonSource);
+        // 3. Run Extraction
+        com.jstarts.codegrapher.core.RepositoryProcessor processor = new com.jstarts.codegrapher.core.RepositoryProcessor(
+                registry);
+        ExtractionContext context = processor.process(repoPath);
+        List<CodeEntity> entities = context.getAllEntities();
+        System.out.println("Extracted " + entities.size() + " entities.");
 
-        walker.walk(tree.getRootNode());
+        // 4. Build Symbol Table
+        com.jstarts.codegrapher.core.GlobalSymbolTable symbolTable = new com.jstarts.codegrapher.core.GlobalSymbolTable(
+                entities, repoPath);
+
+        // 5. Resolve Imports
+        com.jstarts.codegrapher.core.ImportResolver importResolver = new com.jstarts.codegrapher.core.ImportResolver(
+                symbolTable);
+        importResolver.resolveImports(entities);
+        System.out.println("Imports resolved.");
+
+        // 6. Resolve Calls
+        com.jstarts.codegrapher.core.CallGraphResolver callResolver = new com.jstarts.codegrapher.core.CallGraphResolver(
+                symbolTable);
+        callResolver.resolveCalls(entities);
+        System.out.println("Calls resolved.");
+
+        // 7. Persist to Database
+        try {
+            com.jstarts.codegrapher.db.FalkorDBClient.use("localhost", 6379, "CodeGraph", client -> {
+                com.jstarts.codegrapher.db.GraphPersister persister = new com.jstarts.codegrapher.db.GraphPersister(
+                        client);
+                persister.persist(entities);
+                System.out.println("Graph persisted to FalkorDB 'CodeGraph'.");
+                return null;
+            });
+        } catch (Exception e) {
+            System.err.println(
+                    "Failed to persist to database. Is FalkorDB running? (docker run -p 6379:6379 -it --rm falkordb/falkordb:edge)");
+            e.printStackTrace();
+        }
 
         printExtractedEntities(context);
     }
