@@ -12,6 +12,15 @@ public class VariableEntity extends CodeEntity {
     private final boolean isParameterLike;
     private final String typeId;
 
+    private final ScopeKind scope;
+
+    public enum ScopeKind {
+        GLOBAL,
+        LOCAL,
+        CLASS_FIELD,
+        INSTANCE_FIELD
+    }
+
     protected VariableEntity(Builder builder) {
         super(builder);
         this.declaredType = builder.declaredType;
@@ -19,6 +28,7 @@ public class VariableEntity extends CodeEntity {
         this.isAssigned = builder.isAssigned;
         this.isParameterLike = builder.isParameterLike;
         this.typeId = builder.typeId;
+        this.scope = builder.scope;
     }
 
     public static class Builder extends CodeEntity.Builder<Builder> {
@@ -27,6 +37,12 @@ public class VariableEntity extends CodeEntity {
         private boolean isAssigned;
         private boolean isParameterLike;
         private String typeId;
+        private ScopeKind scope;
+
+        public Builder scope(ScopeKind scope) {
+            this.scope = scope;
+            return this;
+        }
 
         public Builder declaredType(String declaredType) {
             this.declaredType = declaredType;

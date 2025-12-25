@@ -31,8 +31,19 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
 
         List<CodeEntity> vars = new ArrayList<>();
         CodeEntity currentParent = context.peekContext();
-        if (currentParent.getType() == CodeEntityType.CLASS) {
-            return List.of();
+
+        // Determine scope
+        VariableEntity.ScopeKind scope = VariableEntity.ScopeKind.LOCAL;
+        if (currentParent == null || currentParent.getType() == CodeEntityType.PACKAGE) { // Should be FileEntity
+                                                                                          // usually
+            // If parent is file, it's global
+            scope = VariableEntity.ScopeKind.GLOBAL;
+        } else if (currentParent instanceof FileEntity) {
+            scope = VariableEntity.ScopeKind.GLOBAL;
+        } else if (currentParent instanceof ClassEntity) {
+            scope = VariableEntity.ScopeKind.CLASS_FIELD;
+        } else if (currentParent instanceof FunctionEntity) {
+            scope = VariableEntity.ScopeKind.LOCAL;
         }
 
         // LHS extraction
@@ -47,11 +58,31 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
         String declaredType = extractField(node, "type", sourceCode).orElse(null);
         boolean isTyped = declaredType != null;
         Node typeNode = node.getChildByFieldName("type");
-        String typeId = pythonTypeParser.parse(typeNode, sourceCode).getId();
+        PythonTypeEntity typeEntity = pythonTypeParser.parse(typeNode, sourceCode);
+        String typeId = typeEntity != null ? typeEntity.getId() : null;
 
         for (Node idNode : identifiers) {
             String name = extractText(idNode, sourceCode);
             SourceLocation loc = buildLocation(filePath, idNode);
+
+            VariableEntity.ScopeKind currentScope = scope;
+
+            // Handle instance fields (self.x)
+            if (idNode.getType().equals("attribute")) {
+                Node object = idNode.getChildByFieldName("object");
+                Node attribute = idNode.getChildByFieldName("attribute");
+                if (object != null && "self".equals(extractText(object, sourceCode))) {
+                    currentScope = VariableEntity.ScopeKind.INSTANCE_FIELD;
+                    name = extractText(attribute, sourceCode); // Use "x" instead of "self.x"
+                    // Adjust location to point to "x"
+                    loc = buildLocation(filePath, attribute);
+                } else {
+                    // Other attributes like "other.x = 1", we might treat as variable "other.x" or
+                    // ignore?
+                    // For now, let's keep full name "other.x" and scope as LOCAL (it's a
+                    // modification of an object in local scope)
+                }
+            }
 
             VariableEntity variable = new VariableEntity.Builder()
                     .id(CodeEntity.generateId(loc))
@@ -62,6 +93,7 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                     .isTyped(isTyped)
                     .isAssigned(true)
                     .isParameterLike(false)
+                    .scope(currentScope)
                     .location(loc)
                     .parentId(context.peekContext() != null
                             ? context.peekContext().getId()
@@ -69,11 +101,6 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                     .build();
 
             vars.add(variable);
-            if (isTyped && declaredType != null && !declaredType.isBlank()) {
-
-
-
-            }
         }
 
         return vars;
@@ -81,13 +108,14 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
 
     /**
      * Recursively collects identifiers appearing on the left-hand side
-     * of an assignment (e.g., x, y, z in "x, (y, z) = foo()").
+     * of an assignment.
      */
     private void collectIdentifiers(Node node, List<Node> collected) {
         if (node == null)
             return;
         switch (node.getType()) {
             case "identifier" -> collected.add(node);
+            case "attribute" -> collected.add(node); // Handle self.x
             case "tuple", "list" -> {
                 for (int i = 0; i < node.getChildCount(); i++) {
                     collectIdentifiers(node.getChild(i), collected);

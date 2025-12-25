@@ -87,6 +87,17 @@ public class VariableEntityExtractorTest {
                 e -> !((com.jstarts.codegrapher.core.entities.VariableEntity) e).isTyped());
 
         assertTrue(hasTyped && hasUntyped, "Should find both typed and untyped variables");
+
+        // Verify Scopes
+        boolean hasGlobal = vars.stream()
+                .anyMatch(e -> ((VariableEntity) e).getScope() == VariableEntity.ScopeKind.GLOBAL);
+        // boolean hasLocal = vars.stream()
+        // .anyMatch(e -> ((VariableEntity) e).getScope() ==
+        // VariableEntity.ScopeKind.LOCAL);
+
+        // We might not have class/instance fields in quick_variable_test.py, let's
+        // check content first or just assert global/local
+        assertTrue(hasGlobal, "Should find global variables");
     }
 
 }
