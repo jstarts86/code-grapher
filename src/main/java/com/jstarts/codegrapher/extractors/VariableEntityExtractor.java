@@ -1,6 +1,8 @@
 package com.jstarts.codegrapher.extractors;
 
 import com.jstarts.codegrapher.core.entities.*;
+import com.jstarts.codegrapher.parsers.PythonTypeParser;
+
 import ch.usi.si.seart.treesitter.Node;
 import java.util.*;
 
@@ -25,6 +27,7 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
             ExtractionContext context,
             String filePath,
             String sourceCode) {
+        PythonTypeParser pythonTypeParser = new PythonTypeParser(context.getTypeCanon());
 
         List<CodeEntity> vars = new ArrayList<>();
         CodeEntity currentParent = context.peekContext();
@@ -43,6 +46,8 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
         // Optional type info
         String declaredType = extractField(node, "type", sourceCode).orElse(null);
         boolean isTyped = declaredType != null;
+        Node typeNode = node.getChildByFieldName("type");
+        String typeId = pythonTypeParser.parse(typeNode, sourceCode).getId();
 
         for (Node idNode : identifiers) {
             String name = extractText(idNode, sourceCode);
@@ -53,6 +58,7 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
                     .type(CodeEntityType.VARIABLE)
                     .name(name)
                     .declaredType(declaredType)
+                    .typeId(typeId)
                     .isTyped(isTyped)
                     .isAssigned(true)
                     .isParameterLike(false)
@@ -64,14 +70,9 @@ public class VariableEntityExtractor implements CodeEntityExtractor {
 
             vars.add(variable);
             if (isTyped && declaredType != null && !declaredType.isBlank()) {
-                // Construct a canonical TypeEntity for this annotation
-                PythonType pyType = PythonType.of(declaredType);
 
-                // Use the cache to get or create the TypeEntity
 
-                // (You will later add the HAS_TYPE edge during Pass 2)
 
-                // (You will later add the HAS_TYPE edge during Pass 2)
             }
         }
 
