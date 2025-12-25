@@ -43,6 +43,15 @@ public class VerifyGraph {
                     System.out.println("Call relationship found: " + row);
                 }
 
+                // 4. Check for Variables
+                result = client.executeQuery("MATCH (v:Variable) RETURN v.name, v.scope");
+                boolean foundVariable = false;
+                for (var row : result) {
+                    foundVariable = true;
+                    System.out.println("Variable: " + row);
+                }
+                assertTrue(foundVariable, "Should find variables");
+
                 return null;
             });
         } catch (Exception e) {

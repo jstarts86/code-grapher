@@ -76,6 +76,16 @@ public class GraphPersister {
             PythonTypeEntity t = (PythonTypeEntity) entity;
             params.put("signature", t.getSignature());
             query.append(", n.signature = $signature ");
+        } else if (entity instanceof VariableEntity) {
+            VariableEntity v = (VariableEntity) entity;
+            if (v.getScope() != null) {
+                params.put("scope", v.getScope().name());
+                query.append(", n.scope = $scope ");
+            }
+            if (v.getDeclaredType() != null) {
+                params.put("declaredType", v.getDeclaredType());
+                query.append(", n.declaredType = $declaredType ");
+            }
         }
 
         client.executeQuery(query.toString(), params);

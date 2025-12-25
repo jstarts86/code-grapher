@@ -44,7 +44,8 @@ public class Main {
         registry.register("import_statement", new com.jstarts.codegrapher.extractors.ImportEntityExtractor());
         registry.register("import_from_statement", new com.jstarts.codegrapher.extractors.ImportEntityExtractor());
         registry.register("call", new com.jstarts.codegrapher.extractors.CallEntityExtractor());
-        // Variable extractor if needed
+        registry.register("assignment", new com.jstarts.codegrapher.extractors.VariableEntityExtractor());
+        registry.register("typed_assignment", new com.jstarts.codegrapher.extractors.VariableEntityExtractor());
 
         // 3. Run Extraction
         com.jstarts.codegrapher.core.RepositoryProcessor processor = new com.jstarts.codegrapher.core.RepositoryProcessor(
