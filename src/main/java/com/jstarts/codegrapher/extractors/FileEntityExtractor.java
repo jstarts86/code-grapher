@@ -34,7 +34,7 @@ public class FileEntityExtractor implements CodeEntityExtractor {
                     .moduleName(fileName)
                     .id(CodeEntity.generateId(location))
                     .location(location)
-                    .parentId(null)
+                    .parentId(context.peekContext() != null ? context.peekContext().getId() : null)
                     .type(CodeEntityType.FILE)
                     .build();
             return Optional.of(fileEntity);
