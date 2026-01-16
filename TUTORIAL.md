@@ -51,6 +51,10 @@ You can specify the database host, port, and a custom graph key:
 mvn exec:java -Dexec.mainClass="com.jstarts.codegrapher.Main" -Dexec.args="--repo /path/to/target/repository --host localhost --port 6379 --graph MyCustomGraph"
 ```
 
+```bash
+mvn exec:java -Dexec.mainClass="com.jstarts.codegraapher.Main" -Dexec.args="--repo src/test/resources/test_repos/sample_project --graph TestGraph"
+```
+
 **Arguments:**
 -   `--repo <path>`: Absolute or relative path to the Python repository you want to analyze. (Required)
 -   `--host <host>`: FalkorDB host (Default: `localhost`)
@@ -72,29 +76,29 @@ Run Cypher queries using the `falkordb.query` command.
 
 #### Check Node Count
 ```redis
-falkordb.query CodeGraph "MATCH (n) RETURN count(n)"
+GRAPH.QUERY CodeGraph "MATCH (n) RETURN count(n)"
 ```
 
 #### List All Files
 ```redis
-falkordb.query CodeGraph "MATCH (f:File) RETURN f.name, f.filePath"
+GRAPH.QUERY CodeGraph "MATCH (f:File) RETURN f.name, f.filePath"
 ```
 
 #### Find Function Calls
 See which functions call which other functions:
 ```redis
-falkordb.query CodeGraph "MATCH (c:Call)-[:CALLS]->(f:Function) RETURN c.callee, f.name"
+GRAPH.QUERY CodeGraph "MATCH (c:Call)-[:CALLS]->(f:Function) RETURN c.callee, f.name"
 ```
 
 #### Explore Variable Scopes
 List variables and their scopes (GLOBAL, LOCAL, INSTANCE_FIELD):
 ```redis
-falkordb.query CodeGraph "MATCH (v:Variable) RETURN v.name, v.scope, v.declaredType"
+GRAPH.QUERY CodeGraph "MATCH (v:Variable) RETURN v.name, v.scope, v.declaredType"
 ```
 
 #### Find Class Hierarchy
 ```redis
-falkordb.query CodeGraph "MATCH (c:Class) RETURN c.name, c.superClasses"
+GRAPH.QUERY CodeGraph "MATCH (c:Class) RETURN c.name, c.superClasses"
 ```
 
 ### Clearing a Graph
@@ -102,7 +106,7 @@ falkordb.query CodeGraph "MATCH (c:Class) RETURN c.name, c.superClasses"
 To delete an existing graph (e.g., to re-run extraction cleanly):
 
 ```bash
-redis-cli falkordb.delete CodeGraph
+redis-cli GRAPH.DELETE CodeGraph
 ```
 
 ## 6. Running Tests
